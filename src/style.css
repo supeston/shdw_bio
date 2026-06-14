@@ -324,6 +324,25 @@ body {
 
 .card-glow, .card-border, .friend-glow, .friend-border {
   position: absolute;
+  /* Base layer: ALWAYS Google colors */
+  background: conic-gradient(
+    from var(--angle),
+    var(--accent-blue) 0deg, var(--accent-blue) 60deg,
+    var(--accent-red) 90deg, var(--accent-red) 150deg,
+    var(--accent-yellow) 180deg, var(--accent-yellow) 240deg,
+    var(--accent-green) 270deg, var(--accent-green) 330deg,
+    var(--accent-blue) 360deg
+  );
+  animation: rotateAngle 40s linear infinite;
+  pointer-events: none;
+}
+
+/* Hover layer */
+.card-glow::after, .card-border::after, .friend-glow::after, .friend-border::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
   background: conic-gradient(
     from var(--angle),
     var(--glow-c1) 0deg, var(--glow-c1) 60deg,
@@ -332,9 +351,22 @@ body {
     var(--glow-c4) 270deg, var(--glow-c4) 330deg,
     var(--glow-c1) 360deg
   );
-  animation: rotateAngle 40s linear infinite;
+  opacity: 0;
+  transition: opacity 0.7s ease-in-out, --glow-c1 0.7s ease-in-out, --glow-c2 0.7s ease-in-out, --glow-c3 0.7s ease-in-out, --glow-c4 0.7s ease-in-out;
+  will-change: opacity;
   pointer-events: none;
-  transition: --glow-c1 0.7s ease-in-out, --glow-c2 0.7s ease-in-out, --glow-c3 0.7s ease-in-out, --glow-c4 0.7s ease-in-out, opacity 0.4s ease;
+}
+
+/* Show hover layer */
+body.glow-active .card-glow::after,
+body.glow-active .card-border::after,
+body.glow-active .friend-glow::after,
+body.glow-active .friend-border::after,
+body[data-active-glow] .card-glow::after,
+body[data-active-glow] .card-border::after,
+body[data-active-glow] .friend-glow::after,
+body[data-active-glow] .friend-border::after {
+  opacity: 1;
 }
 
 .card-glow {
