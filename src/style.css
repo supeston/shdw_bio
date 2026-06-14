@@ -11,7 +11,7 @@
   --primary-glow: rgba(255, 255, 255, 0.35);
   --secondary-color: #a0a0a0;
   --bg-dark: #040409;
-  --bg-card: rgba(8, 8, 16, 0.65);
+  --bg-card: #000000; /* Solid clear black */
   
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.6);
@@ -271,10 +271,10 @@ body {
   transform: translateY(0);
 }
 
-/* Premium Liquid Glass Cards */
+/* Premium Solid Black Cards */
 .bio-card, .modal-card {
   position: relative;
-  background: rgba(8, 8, 16, 0.6);
+  background: #000000; /* Solid clear black to block inner glow leak */
   padding: 2.5rem;
   border-radius: 35px;
   width: 380px;
@@ -283,18 +283,13 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 
-    0 30px 90px -10px rgba(0, 0, 0, 0.8),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-    inset 0 20px 40px rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(40px) saturate(140%);
-  -webkit-backdrop-filter: blur(40px) saturate(140%);
+  box-shadow: 0 30px 90px -10px rgba(0, 0, 0, 0.9);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), box-shadow 0.4s;
   pointer-events: auto;
   will-change: transform, box-shadow;
 }
 
-/* Multi-colored Rotating Glow Cast by the Card (Google Colors) */
+/* Multi-colored Rotating Glow Cast OUTWARDS from the Card (Google Colors) */
 .bio-card::before, #redirect-modal::before, #success-modal::before {
   content: '';
   position: absolute;
@@ -308,9 +303,9 @@ body {
     var(--accent-green) 270deg 350deg,
     var(--accent-blue) 360deg
   );
-  animation: rotateAngle 6s linear infinite;
+  animation: rotateAngle 20s linear infinite; /* Smooth, slow 20-second rotation */
   filter: blur(35px);
-  opacity: 0.55;
+  opacity: 0.65;
   pointer-events: none;
   z-index: -1;
   will-change: transform, opacity;
@@ -332,7 +327,7 @@ body {
     var(--accent-green) 270deg 350deg,
     var(--accent-blue) 360deg
   );
-  animation: rotateAngle 6s linear infinite;
+  animation: rotateAngle 20s linear infinite; /* Slowed down to match the slow glow */
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -348,13 +343,11 @@ body {
 
 .bio-card:hover {
   transform: translateY(-5px) scale(1.01);
-  box-shadow: 
-    0 40px 100px -10px rgba(0, 0, 0, 0.95),
-    inset 0 0 50px rgba(255, 255, 255, 0.08);
+  box-shadow: 0 40px 100px -10px rgba(0, 0, 0, 0.98);
 }
 
 .bio-card:hover::before {
-  opacity: 0.75;
+  opacity: 0.85;
 }
 
 /* Snow Canvas */
@@ -384,7 +377,7 @@ body {
   height: 130px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.2);
+  border: 3px solid rgba(255, 255, 255, 0.25);
   box-shadow: 
     0 0 0 1px rgba(255, 255, 255, 0.05),
     0 10px 30px rgba(0, 0, 0, 0.6),
@@ -823,9 +816,7 @@ body {
   position: fixed;
   z-index: 2000;
   padding: 1.2rem 1.8rem;
-  background: rgba(8, 8, 16, 0.8);
-  backdrop-filter: blur(30px) saturate(140%);
-  -webkit-backdrop-filter: blur(30px) saturate(140%);
+  background: #000000; /* Solid clear black */
   border-radius: 20px;
   pointer-events: none;
   opacity: 0;
@@ -853,7 +844,7 @@ body {
     var(--accent-green) 270deg 350deg,
     var(--accent-blue) 360deg
   );
-  animation: rotateAngle 6s linear infinite;
+  animation: rotateAngle 20s linear infinite; /* Smooth slow rotation */
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
