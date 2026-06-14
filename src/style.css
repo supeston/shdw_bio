@@ -274,7 +274,7 @@ body {
 /* Premium Solid Black Cards */
 .bio-card, .modal-card {
   position: relative;
-  background: #000000; /* Solid clear black to block inner glow leak */
+  background: #000000; /* Solid clear black */
   padding: 2.5rem;
   border-radius: 35px;
   width: 380px;
@@ -287,27 +287,29 @@ body {
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), box-shadow 0.4s;
   pointer-events: auto;
   will-change: transform, box-shadow;
+  /* Ensure the background covers up the pseudo elements completely */
+  background-clip: padding-box;
 }
 
 /* Multi-colored Rotating Glow Cast OUTWARDS from the Card (Google Colors) */
 .bio-card::before, #redirect-modal::before, #success-modal::before {
   content: '';
   position: absolute;
-  inset: -12px;
-  border-radius: 47px;
+  inset: -2px; /* Pull it slightly out */
+  border-radius: 37px;
   background: conic-gradient(
     from var(--angle),
-    var(--accent-blue) 0deg 80deg,
-    var(--accent-red) 90deg 170deg,
-    var(--accent-yellow) 180deg 260deg,
-    var(--accent-green) 270deg 350deg,
+    var(--accent-blue) 0deg, var(--accent-blue) 60deg,
+    var(--accent-red) 90deg, var(--accent-red) 150deg,
+    var(--accent-yellow) 180deg, var(--accent-yellow) 240deg,
+    var(--accent-green) 270deg, var(--accent-green) 330deg,
     var(--accent-blue) 360deg
   );
-  animation: rotateAngle 20s linear infinite; /* Smooth, slow 20-second rotation */
+  animation: rotateAngle 40s linear infinite; /* Very smooth and slow 40-second rotation */
   filter: blur(35px);
   opacity: 0.65;
   pointer-events: none;
-  z-index: -1;
+  z-index: -2; /* Goes behind the solid black */
   will-change: transform, opacity;
   transition: opacity 0.4s;
 }
@@ -316,24 +318,19 @@ body {
 .bio-card::after, #redirect-modal::after, #success-modal::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: 35px;
-  padding: 1.5px;
+  inset: -2px; /* 2px border thickness expanding outwards */
+  border-radius: 37px;
   background: conic-gradient(
     from var(--angle),
-    var(--accent-blue) 0deg 80deg,
-    var(--accent-red) 90deg 170deg,
-    var(--accent-yellow) 180deg 260deg,
-    var(--accent-green) 270deg 350deg,
+    var(--accent-blue) 0deg, var(--accent-blue) 60deg,
+    var(--accent-red) 90deg, var(--accent-red) 150deg,
+    var(--accent-yellow) 180deg, var(--accent-yellow) 240deg,
+    var(--accent-green) 270deg, var(--accent-green) 330deg,
     var(--accent-blue) 360deg
   );
-  animation: rotateAngle 20s linear infinite; /* Slowed down to match the slow glow */
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  animation: rotateAngle 40s linear infinite;
   pointer-events: none;
-  z-index: 3;
+  z-index: -1; /* Behind the solid #000000 background of the card */
 }
 
 @keyframes rotateAngle {
@@ -833,24 +830,19 @@ body {
 .friend-tooltip::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  padding: 1.5px;
+  inset: -1.5px; /* Border thickness */
+  border-radius: 21.5px;
   background: conic-gradient(
     from var(--angle),
-    var(--accent-blue) 0deg 80deg,
-    var(--accent-red) 90deg 170deg,
-    var(--accent-yellow) 180deg 260deg,
-    var(--accent-green) 270deg 350deg,
+    var(--accent-blue) 0deg, var(--accent-blue) 60deg,
+    var(--accent-red) 90deg, var(--accent-red) 150deg,
+    var(--accent-yellow) 180deg, var(--accent-yellow) 240deg,
+    var(--accent-green) 270deg, var(--accent-green) 330deg,
     var(--accent-blue) 360deg
   );
-  animation: rotateAngle 20s linear infinite; /* Smooth slow rotation */
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
+  animation: rotateAngle 40s linear infinite;
   pointer-events: none;
-  z-index: 3;
+  z-index: -1;
 }
 
 .friend-tooltip .tooltip-connector {
