@@ -57,14 +57,12 @@ const socialLinks = document.querySelectorAll(".social-link:not(.delta-force)");
 const friendsBtn = document.getElementById("friends-btn");
 const friendsOrbit = document.getElementById("friends-orbit");
 const friendsConnections = document.getElementById("friends-connections");
-const friendTooltip = document.getElementById("friend-tooltip");
 const friendAvatars = document.querySelectorAll(".friend-avatar");
 
 // Friends Orbit configuration
 let friendsVisible = false;
 let orbitAnimationFrame = null;
 let currentOrbitAngle = 0;
-let selectedFriendIndex = null;
 
 const ORBIT_RADIUS = 320;
 const ORBIT_SPEED = 0.0004; // radians per frame
@@ -484,8 +482,6 @@ function showFriends() {
 
 function hideFriends() {
   stopOrbitAnimation();
-  hideTooltip();
-  selectedFriendIndex = null;
   friendsOrbit.classList.remove("visible");
   friendsConnections.classList.remove("visible");
   setTimeout(() => {
@@ -515,12 +511,7 @@ function positionFriends(angle) {
     });
   });
 
-  // Perform highly optimized SVG lines update
   updateConnectionLines(friendCenters);
-
-  if (selectedFriendIndex !== null) {
-    updateTooltipToAvatar(selectedFriendIndex);
-  }
 }
 
 function updateConnectionLines(friendCenters) {
@@ -563,43 +554,7 @@ function stopOrbitAnimation() {
   }
 }
 
-/**
- * Friend info Tooltip logic
- */
-function hideTooltip() {
-  friendTooltip.classList.remove("visible");
-  friendTooltip.classList.add("hidden");
-}
 
-function updateTooltipToAvatar(index) {
-  const avatarEl = friendAvatars[index];
-  if (!avatarEl) return;
-
-  const avatarRect = avatarEl.getBoundingClientRect();
-  const avatarCenterX = avatarRect.left + avatarRect.width / 2;
-  
-  // Set position layout details
-  const tooltipRect = friendTooltip.getBoundingClientRect();
-  let left = avatarCenterX - tooltipRect.width / 2;
-  let top = avatarRect.top - tooltipRect.height - 25;
-  let isPositionBottom = false;
-
-  // Screen constraint checks
-  if (top < 10) {
-    top = avatarRect.bottom + 25;
-    isPositionBottom = true;
-  }
-  if (left < 10) {
-    left = 10;
-  }
-  if (left + tooltipRect.width > window.innerWidth - 10) {
-    left = window.innerWidth - tooltipRect.width - 10;
-  }
-
-  friendTooltip.classList.toggle("position-bottom", isPositionBottom);
-  friendTooltip.style.left = `${left}px`;
-  friendTooltip.style.top = `${top}px`;
-}
 
 // Initial Event listeners configuration
 document.addEventListener("DOMContentLoaded", () => {
@@ -664,42 +619,7 @@ friendsBtn.addEventListener("click", () => {
   friendsBtn.classList.toggle("active", friendsVisible);
 });
 
-friendAvatars.forEach((el, index) => {
-  el.addEventListener("click", e => {
-    e.stopPropagation();
-    
-    if (selectedFriendIndex === index) {
-      hideTooltip();
-      selectedFriendIndex = null;
-      return;
-    }
 
-    selectedFriendIndex = index;
-    const name = el.dataset.name;
-    const username = el.dataset.username;
-    const userId = el.dataset.id;
-
-    friendTooltip.querySelector(".tooltip-name").textContent = name;
-    
-    const usernameContainer = friendTooltip.querySelector(".tooltip-username");
-    const cleanUsername = username.replace("@", "");
-    usernameContainer.innerHTML = `<a href="https://t.me/${cleanUsername}" target="_blank" rel="noopener noreferrer">${username}</a>`;
-    
-    friendTooltip.querySelector(".tooltip-id").textContent = userId;
-
-    friendTooltip.classList.remove("hidden");
-    friendTooltip.classList.add("visible");
-    updateTooltipToAvatar(index);
-  });
-});
-
-// Click outside tooltip closes it
-document.addEventListener("click", e => {
-  if (!e.target.closest(".friend-avatar") && !e.target.closest(".friend-tooltip")) {
-    hideTooltip();
-    selectedFriendIndex = null;
-  }
-});
 
 entryScreen.addEventListener("click", handleEntryClick);
 entryScreen.addEventListener("touchstart", handleEntryClick, { passive: true });
