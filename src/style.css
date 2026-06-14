@@ -335,7 +335,7 @@ body {
   animation: rotateAngle 40s linear infinite;
   pointer-events: none;
   /* Animate gradient colors dynamically */
-  transition: --glow-c1 0.5s, --glow-c2 0.5s, --glow-c3 0.5s, --glow-c4 0.5s, opacity 0.4s;
+  transition: --glow-c1 0.7s ease-in-out, --glow-c2 0.7s ease-in-out, --glow-c3 0.7s ease-in-out, --glow-c4 0.7s ease-in-out, opacity 0.4s;
 }
 
 .card-glow {
@@ -913,14 +913,25 @@ body {
 
 /* Media Queries & Responsive Layout Tweaks */
 @media (max-width: 480px) {
-  .bio-card {
+  .bio-card, .modal-card {
     width: 320px;
     height: 320px;
-    padding: 2rem;
     border-radius: 30px;
   }
   
-  .bio-card::after, #redirect-modal::after, #success-modal::after {
+  .card-content {
+    padding: 2rem;
+  }
+  
+  .card-glow {
+    border-radius: 36px;
+  }
+  
+  .card-border {
+    border-radius: 32px;
+  }
+  
+  .card-bg, .snow-canvas {
     border-radius: 30px;
   }
   
