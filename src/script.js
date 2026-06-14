@@ -63,6 +63,7 @@ const friendAvatars = document.querySelectorAll(".friend-avatar");
 let friendsVisible = false;
 let orbitAnimationFrame = null;
 let currentOrbitAngle = 0;
+let glowTimeout = null;
 
 const ORBIT_RADIUS = 320;
 const ORBIT_SPEED = 0.0004; // radians per frame
@@ -406,6 +407,10 @@ function hideActiveModal() {
   bioCard.classList.add("card-enter");
 
   // Remove the locked glow color so it reverts to Google colors
+  if (glowTimeout) {
+    clearTimeout(glowTimeout);
+    glowTimeout = null;
+  }
   document.body.removeAttribute("data-active-glow");
   document.body.removeAttribute("data-glow");
   document.body.classList.remove("glow-active");
@@ -421,6 +426,10 @@ function resetToMainCard() {
   bioCard.classList.remove("card-exit");
   bioCard.classList.add("card-enter");
 
+  if (glowTimeout) {
+    clearTimeout(glowTimeout);
+    glowTimeout = null;
+  }
   document.body.removeAttribute("data-active-glow");
   document.body.removeAttribute("data-glow");
   document.body.classList.remove("glow-active");
@@ -593,12 +602,10 @@ function setupDynamicGlowHovers() {
     }
 
     if (glowType) {
-      let leaveTimeout = null;
-      
       link.addEventListener("mouseenter", () => {
-        if (leaveTimeout) {
-          clearTimeout(leaveTimeout);
-          leaveTimeout = null;
+        if (glowTimeout) {
+          clearTimeout(glowTimeout);
+          glowTimeout = null;
         }
         document.body.setAttribute("data-glow", glowType);
         void document.body.offsetWidth;
@@ -606,16 +613,25 @@ function setupDynamicGlowHovers() {
       });
       
       link.addEventListener("mouseleave", () => {
-        document.body.classList.remove("glow-active");
-        leaveTimeout = setTimeout(() => {
-          if (!document.body.classList.contains("glow-active")) {
+        if (glowTimeout) {
+          clearTimeout(glowTimeout);
+        }
+        
+        glowTimeout = setTimeout(() => {
+          document.body.classList.remove("glow-active");
+          glowTimeout = setTimeout(() => {
             document.body.removeAttribute("data-glow");
-          }
-        }, 700);
+            glowTimeout = null;
+          }, 700);
+        }, 50);
       });
 
       // When clicked, lock the glow color for the incoming modal
       link.addEventListener("click", () => {
+        if (glowTimeout) {
+          clearTimeout(glowTimeout);
+          glowTimeout = null;
+        }
         document.body.setAttribute("data-active-glow", glowType);
         document.body.classList.add("glow-active");
       });
