@@ -39,9 +39,9 @@
 
 /* Dynamic Hover Color Effects */
 body[data-glow="telegram"], body[data-active-glow="telegram"] {
-  --glow-c1: #4285F4;
+  --glow-c1: #229ED9;
   --glow-c2: #ffffff;
-  --glow-c3: #4285F4;
+  --glow-c3: #229ED9;
   --glow-c4: #ffffff;
 }
 
@@ -53,9 +53,9 @@ body[data-glow="tiktok"], body[data-active-glow="tiktok"] {
 }
 
 body[data-glow="roblox"], body[data-active-glow="roblox"] {
-  --glow-c1: #001052;
+  --glow-c1: #1446FF;
   --glow-c2: #ffffff;
-  --glow-c3: #0033ff;
+  --glow-c3: #1446FF;
   --glow-c4: #ffffff;
 }
 
