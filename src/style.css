@@ -6,25 +6,64 @@
   inherits: false;
 }
 
+@property --glow-c1 { syntax: '<color>'; initial-value: #4285F4; inherits: true; }
+@property --glow-c2 { syntax: '<color>'; initial-value: #EA4335; inherits: true; }
+@property --glow-c3 { syntax: '<color>'; initial-value: #FBBC05; inherits: true; }
+@property --glow-c4 { syntax: '<color>'; initial-value: #34A853; inherits: true; }
+
 :root {
   --primary-color: #ffffff;
   --primary-glow: rgba(255, 255, 255, 0.35);
   --secondary-color: #a0a0a0;
   --bg-dark: #040409;
-  --bg-card: #000000; /* Solid clear black */
   
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.6);
   --border-color: rgba(255, 255, 255, 0.08);
   
-  /* Original Google Colors */
+  /* Original Google Colors Base */
   --accent-blue: #4285F4;
   --accent-red: #EA4335;
   --accent-yellow: #FBBC05;
   --accent-green: #34A853;
   
+  /* Dynamic Glow Variables defaults */
+  --glow-c1: var(--accent-blue);
+  --glow-c2: var(--accent-red);
+  --glow-c3: var(--accent-yellow);
+  --glow-c4: var(--accent-green);
+  
   --glass-bg: rgba(255, 255, 255, 0.02);
   --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* Dynamic Hover Color Effects */
+body[data-glow="telegram"], body[data-active-glow="telegram"] {
+  --glow-c1: #4285F4;
+  --glow-c2: #ffffff;
+  --glow-c3: #4285F4;
+  --glow-c4: #ffffff;
+}
+
+body[data-glow="tiktok"], body[data-active-glow="tiktok"] {
+  --glow-c1: #000000;
+  --glow-c2: #ff007f;
+  --glow-c3: #00bfff;
+  --glow-c4: #ff007f;
+}
+
+body[data-glow="roblox"], body[data-active-glow="roblox"] {
+  --glow-c1: #001052;
+  --glow-c2: #ffffff;
+  --glow-c3: #0033ff;
+  --glow-c4: #ffffff;
+}
+
+body[data-glow="delta"], body[data-active-glow="delta"] {
+  --glow-c1: #00ff7f;
+  --glow-c2: #ffffff;
+  --glow-c3: #00ff7f;
+  --glow-c4: #ffffff;
 }
 
 /* Reset and Core Layout */
@@ -274,63 +313,64 @@ body {
 /* Premium Solid Black Cards */
 .bio-card, .modal-card {
   position: relative;
-  background: #000000; /* Solid clear black */
-  padding: 2.5rem;
-  border-radius: 35px;
   width: 380px;
   height: 380px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  border-radius: 35px;
   box-shadow: 0 30px 90px -10px rgba(0, 0, 0, 0.9);
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), box-shadow 0.4s;
   pointer-events: auto;
   will-change: transform, box-shadow;
-  /* Ensure the background covers up the pseudo elements completely */
-  background-clip: padding-box;
 }
 
-/* Multi-colored Rotating Glow Cast OUTWARDS from the Card (Google Colors) */
-.bio-card::before, #redirect-modal::before, #success-modal::before {
-  content: '';
+.card-glow, .card-border, .friend-glow, .friend-border {
   position: absolute;
-  inset: -6px; /* Pull it slightly out for a wider glow */
-  border-radius: 41px;
   background: conic-gradient(
     from var(--angle),
-    var(--accent-blue) 0deg, var(--accent-blue) 60deg,
-    var(--accent-red) 90deg, var(--accent-red) 150deg,
-    var(--accent-yellow) 180deg, var(--accent-yellow) 240deg,
-    var(--accent-green) 270deg, var(--accent-green) 330deg,
-    var(--accent-blue) 360deg
-  );
-  animation: rotateAngle 40s linear infinite; /* Very smooth and slow 40-second rotation */
-  filter: blur(40px);
-  opacity: 0.95; /* More pronounced glow */
-  pointer-events: none;
-  z-index: -2; /* Goes behind the solid black */
-  will-change: transform, opacity;
-  transition: opacity 0.4s;
-}
-
-/* Stationary Rounded Flowing Glowing Borders (Google Colors) */
-.bio-card::after, #redirect-modal::after, #success-modal::after {
-  content: '';
-  position: absolute;
-  inset: -2px; /* 2px border thickness expanding outwards */
-  border-radius: 37px;
-  background: conic-gradient(
-    from var(--angle),
-    var(--accent-blue) 0deg, var(--accent-blue) 60deg,
-    var(--accent-red) 90deg, var(--accent-red) 150deg,
-    var(--accent-yellow) 180deg, var(--accent-yellow) 240deg,
-    var(--accent-green) 270deg, var(--accent-green) 330deg,
-    var(--accent-blue) 360deg
+    var(--glow-c1) 0deg, var(--glow-c1) 60deg,
+    var(--glow-c2) 90deg, var(--glow-c2) 150deg,
+    var(--glow-c3) 180deg, var(--glow-c3) 240deg,
+    var(--glow-c4) 270deg, var(--glow-c4) 330deg,
+    var(--glow-c1) 360deg
   );
   animation: rotateAngle 40s linear infinite;
   pointer-events: none;
-  z-index: -1; /* Behind the solid #000000 background of the card */
+  /* Animate gradient colors dynamically */
+  transition: --glow-c1 0.5s, --glow-c2 0.5s, --glow-c3 0.5s, --glow-c4 0.5s, opacity 0.4s;
+}
+
+.card-glow {
+  inset: -6px;
+  border-radius: 41px;
+  filter: blur(40px);
+  opacity: 0.95;
+  z-index: 1;
+}
+
+.card-border {
+  inset: -2px;
+  border-radius: 37px;
+  z-index: 2;
+}
+
+.card-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 35px;
+  background: #000000;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.card-content {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 @keyframes rotateAngle {
@@ -343,11 +383,11 @@ body {
   box-shadow: 0 40px 100px -10px rgba(0, 0, 0, 0.98);
 }
 
-.bio-card:hover::before {
+.bio-card:hover .card-glow {
   opacity: 0.85;
 }
 
-/* Snow Canvas used as the solid black core of the card to mask the inner gradients */
+/* Snow Canvas */
 .snow-canvas {
   position: absolute;
   top: 0;
@@ -355,10 +395,9 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 0;
+  z-index: 0; /* Background layer inside card-content */
   border-radius: 35px;
-  background: #000000; /* Solid black core */
-  /* Opacity removed to ensure the black is fully opaque and hides the gradient inside */
+  /* Removed solid black, bg is handled by .card-bg now */
 }
 
 /* Avatar Components */
@@ -782,47 +821,23 @@ body {
   will-change: left, top, transform, opacity;
 }
 
-/* Glowing background for friend avatar */
-.friend-avatar::before {
-  content: '';
-  position: absolute;
+.friend-glow {
   inset: -6px;
   border-radius: 50%;
-  background: conic-gradient(
-    from var(--angle),
-    var(--accent-blue) 0deg, var(--accent-blue) 60deg,
-    var(--accent-red) 90deg, var(--accent-red) 150deg,
-    var(--accent-yellow) 180deg, var(--accent-yellow) 240deg,
-    var(--accent-green) 270deg, var(--accent-green) 330deg,
-    var(--accent-blue) 360deg
-  );
-  animation: rotateAngle 40s linear infinite;
   filter: blur(20px);
   opacity: 0.95;
-  z-index: -2;
-  pointer-events: none;
+  z-index: 1;
 }
 
-/* Glowing border for friend avatar */
-.friend-avatar::after {
-  content: '';
-  position: absolute;
+.friend-border {
   inset: -2px;
   border-radius: 50%;
-  background: conic-gradient(
-    from var(--angle),
-    var(--accent-blue) 0deg, var(--accent-blue) 60deg,
-    var(--accent-red) 90deg, var(--accent-red) 150deg,
-    var(--accent-yellow) 180deg, var(--accent-yellow) 240deg,
-    var(--accent-green) 270deg, var(--accent-green) 330deg,
-    var(--accent-blue) 360deg
-  );
-  animation: rotateAngle 40s linear infinite;
-  z-index: -1;
-  pointer-events: none;
+  z-index: 2;
 }
 
 .friend-avatar img {
+  position: relative;
+  z-index: 3;
   width: 100%;
   height: 100%;
   border-radius: 50%;

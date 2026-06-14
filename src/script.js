@@ -392,6 +392,24 @@ function animateProgress(url) {
   requestAnimationFrame(step);
 }
 
+function hideActiveModal() {
+  const activeModal = document.querySelector(".modal:not(.hidden)");
+  if (!activeModal) return;
+  
+  activeModal.classList.add("hidden");
+  activeModal.classList.remove("visible");
+  activeModalId = null;
+  
+  // Bring the bio card back
+  const bioCard = document.querySelector(".bio-card");
+  bioCard.classList.remove("card-exit");
+  bioCard.classList.add("card-enter");
+
+  // Remove the locked glow color so it reverts to Google colors
+  document.body.removeAttribute("data-active-glow");
+  document.body.removeAttribute("data-glow");
+}
+
 function resetToMainCard() {
   redirectModal.classList.add("hidden");
   redirectModal.classList.remove("card-enter");
@@ -401,6 +419,9 @@ function resetToMainCard() {
   bioCard.style.display = "flex";
   bioCard.classList.remove("card-exit");
   bioCard.classList.add("card-enter");
+
+  document.body.removeAttribute("data-active-glow");
+  document.body.removeAttribute("data-glow");
 
   startAvatarRotation();
   switchSnowEffect("main");
@@ -554,12 +575,43 @@ function stopOrbitAnimation() {
   }
 }
 
+// Dynamic Glow Effects for Social Links
+function setupDynamicGlowHovers() {
+  const allSocialLinks = document.querySelectorAll(".social-link");
+  allSocialLinks.forEach(link => {
+    let glowType = "";
+    if (link.classList.contains("delta-force")) {
+      glowType = "delta";
+    } else if (link.href && (link.href.includes("t.me") || link.href.includes("telegram"))) {
+      glowType = "telegram";
+    } else if (link.href && link.href.includes("tiktok")) {
+      glowType = "tiktok";
+    } else if (link.href && link.href.includes("roblox")) {
+      glowType = "roblox";
+    }
 
+    if (glowType) {
+      link.addEventListener("mouseenter", () => {
+        document.body.setAttribute("data-glow", glowType);
+      });
+      
+      link.addEventListener("mouseleave", () => {
+        document.body.removeAttribute("data-glow");
+      });
+
+      // When clicked, lock the glow color for the incoming modal
+      link.addEventListener("click", () => {
+        document.body.setAttribute("data-active-glow", glowType);
+      });
+    }
+  });
+}
 
 // Initial Event listeners configuration
 document.addEventListener("DOMContentLoaded", () => {
   preloadImages();
   setupVideoLoop();
+  setupDynamicGlowHovers();
 
   // Initialize Canvas Snow instances
   const canvasIds = {
