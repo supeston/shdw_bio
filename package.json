@@ -1,0 +1,14 @@
+{
+  "name": "shdw_bio",
+  "version": "1.0.0",
+  "description": "Optimized and beautified Personal Bio Card",
+  "main": "index.html",
+  "scripts": {
+    "build": "node minify.js"
+  },
+  "devDependencies": {
+    "clean-css": "^5.3.3",
+    "html-minifier-terser": "^7.2.0",
+    "terser": "^5.31.1"
+  }
+}
