@@ -295,8 +295,8 @@ body {
 .bio-card::before, #redirect-modal::before, #success-modal::before {
   content: '';
   position: absolute;
-  inset: -2px; /* Pull it slightly out */
-  border-radius: 37px;
+  inset: -6px; /* Pull it slightly out for a wider glow */
+  border-radius: 41px;
   background: conic-gradient(
     from var(--angle),
     var(--accent-blue) 0deg, var(--accent-blue) 60deg,
@@ -306,8 +306,8 @@ body {
     var(--accent-blue) 360deg
   );
   animation: rotateAngle 40s linear infinite; /* Very smooth and slow 40-second rotation */
-  filter: blur(35px);
-  opacity: 0.65;
+  filter: blur(40px);
+  opacity: 0.95; /* More pronounced glow */
   pointer-events: none;
   z-index: -2; /* Goes behind the solid black */
   will-change: transform, opacity;
@@ -347,7 +347,7 @@ body {
   opacity: 0.85;
 }
 
-/* Snow Canvas */
+/* Snow Canvas used as the solid black core of the card to mask the inner gradients */
 .snow-canvas {
   position: absolute;
   top: 0;
@@ -357,7 +357,8 @@ body {
   pointer-events: none;
   z-index: 0;
   border-radius: 35px;
-  opacity: 0.65;
+  background: #000000; /* Solid black core */
+  /* Opacity removed to ensure the black is fully opaque and hides the gradient inside */
 }
 
 /* Avatar Components */
@@ -813,7 +814,7 @@ body {
   position: fixed;
   z-index: 2000;
   padding: 1.2rem 1.8rem;
-  background: #000000; /* Solid clear black */
+  background: transparent; /* Changed to transparent, ::before provides the background */
   border-radius: 20px;
   pointer-events: none;
   opacity: 0;
@@ -827,6 +828,18 @@ body {
   will-change: transform, opacity;
 }
 
+/* Black core mask for the tooltip */
+.friend-tooltip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: #000000;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Glowing border for the tooltip */
 .friend-tooltip::after {
   content: '';
   position: absolute;
@@ -842,7 +855,7 @@ body {
   );
   animation: rotateAngle 40s linear infinite;
   pointer-events: none;
-  z-index: -1;
+  z-index: -2; /* Under the black mask */
 }
 
 .friend-tooltip .tooltip-connector {
