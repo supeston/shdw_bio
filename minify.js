@@ -15,7 +15,7 @@ async function build() {
   const cssInputPath = path.join(srcDir, 'style.css');
   if (fs.existsSync(cssInputPath)) {
     const cssContent = fs.readFileSync(cssInputPath, 'utf8');
-    const cssMinified = new CleanCSS({ level: 2 }).minify(cssContent);
+    const cssMinified = new CleanCSS({ level: 1 }).minify(cssContent);
     if (cssMinified.errors.length) {
       console.error('CSS Minification Errors:', cssMinified.errors);
     }

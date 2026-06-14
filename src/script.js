@@ -408,6 +408,7 @@ function hideActiveModal() {
   // Remove the locked glow color so it reverts to Google colors
   document.body.removeAttribute("data-active-glow");
   document.body.removeAttribute("data-glow");
+  document.body.classList.remove("glow-active");
 }
 
 function resetToMainCard() {
@@ -422,6 +423,7 @@ function resetToMainCard() {
 
   document.body.removeAttribute("data-active-glow");
   document.body.removeAttribute("data-glow");
+  document.body.classList.remove("glow-active");
 
   startAvatarRotation();
   switchSnowEffect("main");
@@ -591,17 +593,31 @@ function setupDynamicGlowHovers() {
     }
 
     if (glowType) {
+      let leaveTimeout = null;
+      
       link.addEventListener("mouseenter", () => {
+        if (leaveTimeout) {
+          clearTimeout(leaveTimeout);
+          leaveTimeout = null;
+        }
         document.body.setAttribute("data-glow", glowType);
+        void document.body.offsetWidth;
+        document.body.classList.add("glow-active");
       });
       
       link.addEventListener("mouseleave", () => {
-        document.body.removeAttribute("data-glow");
+        document.body.classList.remove("glow-active");
+        leaveTimeout = setTimeout(() => {
+          if (!document.body.classList.contains("glow-active")) {
+            document.body.removeAttribute("data-glow");
+          }
+        }, 700);
       });
 
       // When clicked, lock the glow color for the incoming modal
       link.addEventListener("click", () => {
         document.body.setAttribute("data-active-glow", glowType);
+        document.body.classList.add("glow-active");
       });
     }
   });
