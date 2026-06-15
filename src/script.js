@@ -61,29 +61,7 @@ const friendAvatars = document.querySelectorAll(".friend-avatar");
 
 // Friends Orbit configuration
 let friendsVisible = false;
-let orbitAnimationFrame = null;
-let currentOrbitAngle = 0;
 let glowTimeout = null;
-
-const ORBIT_RADIUS = 320;
-const ORBIT_SPEED = 0.0004; // radians per frame
-const friendPositions = [-Math.PI / 2, 0, Math.PI / 2, Math.PI];
-
-// SVG Connection line elements (pre-created to avoid innerHTML thrashing)
-let connectionLines = [];
-let outerLines = [];
-
-// Layout cache to eliminate getBoundingClientRect layout thrashing
-let layoutCache = {
-  centerX: 0,
-  centerY: 0,
-  orbitLeft: 0,
-  orbitTop: 0,
-  avatarWidth: 130,
-  avatarHeight: 130,
-  avatarCenterX: 0,
-  avatarCenterY: 0
-};
 
 /**
  * Preload avatar rotation images to prevent flickering when transitioning
@@ -117,56 +95,7 @@ function stopAvatarRotation() {
   }
 }
 
-/**
- * Cache visual layout dimensions.
- * Runs on resize to prevent calling getBoundingClientRect in requestAnimationFrame loop.
- */
-function updateLayoutCache() {
-  if (!mainContent.classList.contains("visible")) return;
-
-  const cardRect = bioCard.getBoundingClientRect();
-  layoutCache.centerX = cardRect.left + cardRect.width / 2;
-  layoutCache.centerY = cardRect.top + cardRect.height / 2;
-
-  const orbitRect = friendsOrbit.getBoundingClientRect();
-  layoutCache.orbitLeft = orbitRect.left;
-  layoutCache.orbitTop = orbitRect.top;
-
-  const avatarRect = avatar.getBoundingClientRect();
-  layoutCache.avatarWidth = avatarRect.width;
-  layoutCache.avatarHeight = avatarRect.height;
-  layoutCache.avatarCenterX = avatarRect.left + avatarRect.width / 2;
-  layoutCache.avatarCenterY = avatarRect.top + avatarRect.height / 2;
-
-  // Redraw connections immediately with new cache
-  if (friendsVisible) {
-    positionFriends(currentOrbitAngle);
-  }
-}
-
-/**
- * Pre-create SVG lines once when the page loads to avoid DOM recreation in the animation loop
- */
-function initSvgLines() {
-  friendsConnections.innerHTML = "";
-  connectionLines = [];
-  outerLines = [];
-
-  // Create 4 outer polygon lines connecting friend to friend
-  for (let i = 0; i < 4; i++) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    friendsConnections.appendChild(line);
-    outerLines.push(line);
-  }
-
-  // Create 4 connector lines from the avatar center to each friend
-  for (let i = 0; i < 4; i++) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.classList.add("center-line");
-    friendsConnections.appendChild(line);
-    connectionLines.push(line);
-  }
-}
+/* Layout calculations and SVG line pre-creations are removed as positioning is now statically handled in CSS and HTML */
 
 /**
  * Video background handlers
@@ -212,7 +141,6 @@ function handleEntryClick() {
   entryScreen.classList.add("hidden");
   setTimeout(() => {
     mainContent.classList.add("visible");
-    updateLayoutCache(); // Initial cache load now that card is visible
     startAllSnow();
   }, 300);
   playVideo();
@@ -338,7 +266,6 @@ function switchSnowEffect(activeKey) {
  */
 function startRedirectFlow(url, name, svgIcon) {
   // Pause main loops
-  stopOrbitAnimation();
   stopAvatarRotation();
   switchSnowEffect("redirect");
 
@@ -346,8 +273,8 @@ function startRedirectFlow(url, name, svgIcon) {
   bioCard.classList.add("card-exit");
 
   if (friendsVisible) {
+    friendsOrbit.classList.remove("rotating");
     friendsOrbit.classList.add("card-exit-friends");
-    friendsConnections.classList.add("card-exit-friends");
   }
 
   setTimeout(() => {
@@ -360,7 +287,6 @@ function startRedirectFlow(url, name, svgIcon) {
     bioCard.style.display = "none";
     if (friendsVisible) {
       friendsOrbit.style.display = "none";
-      friendsConnections.style.display = "none";
     }
 
     redirectModal.classList.remove("hidden");
@@ -439,15 +365,11 @@ function resetToMainCard() {
 
   if (friendsVisible) {
     friendsOrbit.style.display = "";
-    friendsConnections.style.display = "";
     friendsOrbit.classList.remove("card-exit-friends");
-    friendsConnections.classList.remove("card-exit-friends");
     
     setTimeout(() => {
       friendsOrbit.classList.add("visible");
-      friendsConnections.classList.add("visible");
-      updateLayoutCache(); // Reload layout coordinates
-      startOrbitAnimation();
+      friendsOrbit.classList.add("rotating");
     }, 300);
   }
 }
@@ -461,7 +383,6 @@ function copyDeltaForceIdWithAnimation() {
   });
 
   // Pause background calculations
-  stopOrbitAnimation();
   stopAvatarRotation();
   switchSnowEffect("success");
 
@@ -469,15 +390,14 @@ function copyDeltaForceIdWithAnimation() {
   bioCard.classList.add("card-exit");
 
   if (friendsVisible) {
+    friendsOrbit.classList.remove("rotating");
     friendsOrbit.classList.add("card-exit-friends");
-    friendsConnections.classList.add("card-exit-friends");
   }
 
   setTimeout(() => {
     bioCard.style.display = "none";
     if (friendsVisible) {
       friendsOrbit.style.display = "none";
-      friendsConnections.style.display = "none";
     }
 
     successModal.classList.remove("hidden");
@@ -495,95 +415,24 @@ function copyDeltaForceIdWithAnimation() {
 }
 
 /**
- * Orbit Animation Calculations
+ * Orbit Animation Control
  */
 function showFriends() {
   friendsOrbit.classList.remove("hidden");
-  initSvgLines(); // Setup SVGs once
-  updateLayoutCache();
-  positionFriends(currentOrbitAngle);
-
   setTimeout(() => {
     friendsOrbit.classList.add("visible");
-    friendsConnections.classList.add("visible");
-    setTimeout(() => {
-      startOrbitAnimation();
-    }, 600);
+    friendsOrbit.classList.add("rotating");
   }, 50);
 }
 
 function hideFriends() {
-  stopOrbitAnimation();
   friendsOrbit.classList.remove("visible");
-  friendsConnections.classList.remove("visible");
+  friendsOrbit.classList.remove("rotating");
   setTimeout(() => {
-    friendsOrbit.classList.add("hidden");
+    if (!friendsVisible) {
+      friendsOrbit.classList.add("hidden");
+    }
   }, 600);
-}
-
-function positionFriends(angle) {
-  const friendCenters = [];
-
-  friendAvatars.forEach((el, index) => {
-    const individualAngle = friendPositions[index] + angle;
-    
-    // Pure math placement based on cached central positions
-    const posX = layoutCache.centerX + ORBIT_RADIUS * Math.cos(individualAngle) - 40 - layoutCache.orbitLeft;
-    const posY = layoutCache.centerY + ORBIT_RADIUS * Math.sin(individualAngle) - 40 - layoutCache.orbitTop;
-
-    el.style.left = `${posX}px`;
-    el.style.top = `${posY}px`;
-    el.style.marginLeft = "0";
-    el.style.marginTop = "0";
-
-    // Keep track of friend centers relative to global screen for SVG lines
-    friendCenters.push({
-      x: layoutCache.orbitLeft + posX + 40,
-      y: layoutCache.orbitTop + posY + 40
-    });
-  });
-
-  updateConnectionLines(friendCenters);
-}
-
-function updateConnectionLines(friendCenters) {
-  if (friendCenters.length === 0 || connectionLines.length === 0) return;
-
-  for (let i = 0; i < 4; i++) {
-    const nextIdx = (i + 1) % 4;
-    
-    // 1. Update outer polygon ring line coordinates
-    const outerLine = outerLines[i];
-    outerLine.setAttribute("x1", friendCenters[i].x);
-    outerLine.setAttribute("y1", friendCenters[i].y);
-    outerLine.setAttribute("x2", friendCenters[nextIdx].x);
-    outerLine.setAttribute("y2", friendCenters[nextIdx].y);
-
-    // 2. Update center line coordinates linking avatar to friend
-    const connLine = connectionLines[i];
-    connLine.setAttribute("x1", friendCenters[i].x);
-    connLine.setAttribute("y1", friendCenters[i].y);
-    connLine.setAttribute("x2", layoutCache.avatarCenterX);
-    connLine.setAttribute("y2", layoutCache.avatarCenterY);
-  }
-}
-
-function startOrbitAnimation() {
-  if (orbitAnimationFrame) return;
-  
-  function animate() {
-    currentOrbitAngle += ORBIT_SPEED;
-    positionFriends(currentOrbitAngle);
-    orbitAnimationFrame = requestAnimationFrame(animate);
-  }
-  orbitAnimationFrame = requestAnimationFrame(animate);
-}
-
-function stopOrbitAnimation() {
-  if (orbitAnimationFrame) {
-    cancelAnimationFrame(orbitAnimationFrame);
-    orbitAnimationFrame = null;
-  }
 }
 
 // Dynamic Glow Effects for Social Links
@@ -708,8 +557,21 @@ friendsBtn.addEventListener("click", () => {
 entryScreen.addEventListener("click", handleEntryClick);
 entryScreen.addEventListener("touchstart", handleEntryClick, { passive: true });
 
-window.addEventListener("resize", () => {
-  updateLayoutCache();
+// Power saving: Page Visibility API
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    bgVideo.pause();
+    stopAvatarRotation();
+  } else {
+    // Only resume if we have already entered the main screen
+    if (entryScreen.classList.contains("hidden")) {
+      const isModalActive = !redirectModal.classList.contains("hidden") || !successModal.classList.contains("hidden");
+      if (!isModalActive) {
+        playVideo();
+      }
+      startAvatarRotation();
+    }
+  }
 });
 
 document.addEventListener("keydown", e => {

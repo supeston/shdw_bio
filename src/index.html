@@ -40,13 +40,12 @@
     <div class="video-overlay"></div>
   </div>
 
-  <!-- Friends Connections Lines SVG Canvas -->
-  <svg class="friends-connections" id="friends-connections"></svg>
+
 
   <!-- Main Container -->
   <main class="main-container" id="main-content">
     <div class="bio-card">
-      <div class="card-glow"></div>
+      <div class="card-glow"><div class="card-glow-inner"></div></div>
       <div class="card-border"></div>
       <div class="card-bg"></div>
       <div class="card-content">
@@ -97,7 +96,7 @@
 
     <!-- Redirect Modal -->
     <div class="hidden modal modal-card" id="redirect-modal">
-      <div class="card-glow"></div>
+      <div class="card-glow"><div class="card-glow-inner"></div></div>
       <div class="card-border"></div>
       <div class="card-bg"></div>
       <div class="card-content">
@@ -117,7 +116,7 @@
 
     <!-- Copy Success Modal -->
     <div class="hidden modal modal-card" id="success-modal">
-      <div class="card-glow"></div>
+      <div class="card-glow"><div class="card-glow-inner"></div></div>
       <div class="card-border"></div>
       <div class="card-bg"></div>
       <div class="card-content">
@@ -136,15 +135,35 @@
 
     <!-- Friends Orbit Button -->
     <button class="friends-btn" id="friends-btn">
-      <svg fill="currentColor" viewBox="0 0 24 24">
-        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-      </svg>
-      <span>Кенты</span>
+      <div class="friends-btn-glow"><div class="card-glow-inner"></div></div>
+      <div class="friends-btn-border"></div>
+      <div class="friends-btn-bg"></div>
+      <div class="friends-btn-content">
+        <svg fill="currentColor" viewBox="0 0 24 24">
+          <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+        </svg>
+        <span>Кенты</span>
+      </div>
     </button>
   </main>
 
   <!-- Orbiting Friends Avatars -->
   <div class="hidden friends-orbit" id="friends-orbit">
+    <!-- Friends Connections Lines SVG Canvas -->
+    <svg class="friends-connections" id="friends-connections" viewBox="0 0 800 800">
+      <!-- Outer polygon lines -->
+      <line x1="400" y1="80" x2="720" y2="400"></line>
+      <line x1="720" y1="400" x2="400" y2="720"></line>
+      <line x1="400" y1="720" x2="80" y2="400"></line>
+      <line x1="80" y1="400" x2="400" y2="80"></line>
+
+      <!-- Center lines -->
+      <line class="center-line" x1="400" y1="80" x2="400" y2="400"></line>
+      <line class="center-line" x1="720" y1="400" x2="400" y2="400"></line>
+      <line class="center-line" x1="400" y1="720" x2="400" y2="400"></line>
+      <line class="center-line" x1="80" y1="400" x2="400" y2="400"></line>
+    </svg>
+
     <div class="friend-avatar" data-friend="1" data-id="5215840558" data-name="талант фiмоzов" data-username="@mozzaff">
       <div class="friend-glow"></div>
       <div class="friend-border"></div>
