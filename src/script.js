@@ -56,7 +56,7 @@ const socialLinks = document.querySelectorAll(".social-link:not(.delta-force)");
 
 const friendsBtn = document.getElementById("friends-btn");
 const friendsOrbit = document.getElementById("friends-orbit");
-const friendsConnections = document.getElementById("friends-connections");
+const friendsConnectionsWrapper = document.getElementById("friends-connections-wrapper");
 const friendAvatars = document.querySelectorAll(".friend-avatar");
 
 // Friends Orbit configuration
@@ -274,9 +274,11 @@ function startRedirectFlow(url, name, svgIcon) {
 
   if (friendsVisible) {
     friendsOrbit.classList.remove("rotating");
+    friendsOrbit.classList.remove("visible");
     friendsOrbit.classList.add("card-exit-friends");
-    friendsConnections.classList.remove("rotating");
-    friendsConnections.classList.add("card-exit-friends");
+    friendsConnectionsWrapper.classList.remove("rotating");
+    friendsConnectionsWrapper.classList.remove("visible");
+    friendsConnectionsWrapper.classList.add("card-exit-friends");
   }
 
   setTimeout(() => {
@@ -289,7 +291,7 @@ function startRedirectFlow(url, name, svgIcon) {
     bioCard.style.display = "none";
     if (friendsVisible) {
       friendsOrbit.style.display = "none";
-      friendsConnections.style.display = "none";
+      friendsConnectionsWrapper.style.display = "none";
     }
 
     redirectModal.classList.remove("hidden");
@@ -369,14 +371,14 @@ function resetToMainCard() {
   if (friendsVisible) {
     friendsOrbit.style.display = "";
     friendsOrbit.classList.remove("card-exit-friends");
-    friendsConnections.style.display = "";
-    friendsConnections.classList.remove("card-exit-friends");
+    friendsConnectionsWrapper.style.display = "";
+    friendsConnectionsWrapper.classList.remove("card-exit-friends");
     
     setTimeout(() => {
       friendsOrbit.classList.add("visible");
       friendsOrbit.classList.add("rotating");
-      friendsConnections.classList.add("visible");
-      friendsConnections.classList.add("rotating");
+      friendsConnectionsWrapper.classList.add("visible");
+      friendsConnectionsWrapper.classList.add("rotating");
     }, 300);
   }
 }
@@ -398,16 +400,18 @@ function copyDeltaForceIdWithAnimation() {
 
   if (friendsVisible) {
     friendsOrbit.classList.remove("rotating");
+    friendsOrbit.classList.remove("visible");
     friendsOrbit.classList.add("card-exit-friends");
-    friendsConnections.classList.remove("rotating");
-    friendsConnections.classList.add("card-exit-friends");
+    friendsConnectionsWrapper.classList.remove("rotating");
+    friendsConnectionsWrapper.classList.remove("visible");
+    friendsConnectionsWrapper.classList.add("card-exit-friends");
   }
 
   setTimeout(() => {
     bioCard.style.display = "none";
     if (friendsVisible) {
       friendsOrbit.style.display = "none";
-      friendsConnections.style.display = "none";
+      friendsConnectionsWrapper.style.display = "none";
     }
 
     successModal.classList.remove("hidden");
@@ -429,24 +433,24 @@ function copyDeltaForceIdWithAnimation() {
  */
 function showFriends() {
   friendsOrbit.classList.remove("hidden");
-  friendsConnections.classList.remove("hidden");
+  friendsConnectionsWrapper.classList.remove("hidden");
   setTimeout(() => {
     friendsOrbit.classList.add("visible");
     friendsOrbit.classList.add("rotating");
-    friendsConnections.classList.add("visible");
-    friendsConnections.classList.add("rotating");
+    friendsConnectionsWrapper.classList.add("visible");
+    friendsConnectionsWrapper.classList.add("rotating");
   }, 50);
 }
 
 function hideFriends() {
   friendsOrbit.classList.remove("visible");
-  friendsConnections.classList.remove("visible");
+  friendsConnectionsWrapper.classList.remove("visible");
   setTimeout(() => {
     if (!friendsVisible) {
       friendsOrbit.classList.remove("rotating");
       friendsOrbit.classList.add("hidden");
-      friendsConnections.classList.remove("rotating");
-      friendsConnections.classList.add("hidden");
+      friendsConnectionsWrapper.classList.remove("rotating");
+      friendsConnectionsWrapper.classList.add("hidden");
     }
   }, 600);
 }

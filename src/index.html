@@ -151,19 +151,21 @@
   </main>
 
   <!-- Friends Connections Lines SVG Canvas -->
-  <svg class="friends-connections hidden" id="friends-connections" viewBox="0 0 800 800">
-    <!-- Outer polygon lines -->
-    <line x1="400" y1="80" x2="720" y2="400"></line>
-    <line x1="720" y1="400" x2="400" y2="720"></line>
-    <line x1="400" y1="720" x2="80" y2="400"></line>
-    <line x1="80" y1="400" x2="400" y2="80"></line>
+  <div class="friends-connections-wrapper hidden" id="friends-connections-wrapper">
+    <svg class="friends-connections" id="friends-connections" viewBox="0 0 800 800">
+      <!-- Outer polygon lines -->
+      <line x1="400" y1="80" x2="720" y2="400"></line>
+      <line x1="720" y1="400" x2="400" y2="720"></line>
+      <line x1="400" y1="720" x2="80" y2="400"></line>
+      <line x1="80" y1="400" x2="400" y2="80"></line>
 
-    <!-- Center lines -->
-    <line class="center-line" x1="400" y1="80" x2="400" y2="400"></line>
-    <line class="center-line" x1="720" y1="400" x2="400" y2="400"></line>
-    <line class="center-line" x1="400" y1="720" x2="400" y2="400"></line>
-    <line class="center-line" x1="80" y1="400" x2="400" y2="400"></line>
-  </svg>
+      <!-- Center lines -->
+      <line class="center-line" x1="400" y1="80" x2="400" y2="400"></line>
+      <line class="center-line" x1="720" y1="400" x2="400" y2="400"></line>
+      <line class="center-line" x1="400" y1="720" x2="400" y2="400"></line>
+      <line class="center-line" x1="80" y1="400" x2="400" y2="400"></line>
+    </svg>
+  </div>
 
   <!-- Orbiting Friends Avatars -->
   <div class="hidden friends-orbit" id="friends-orbit">
