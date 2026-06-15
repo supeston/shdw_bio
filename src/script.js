@@ -54,13 +54,6 @@ const progressFill = document.getElementById("progress-fill");
 const progressPercentage = document.getElementById("progress-percentage");
 const socialLinks = document.querySelectorAll(".social-link:not(.delta-force)");
 
-const friendsBtn = document.getElementById("friends-btn");
-const friendsOrbit = document.getElementById("friends-orbit");
-const friendsConnectionsWrapper = document.getElementById("friends-connections-wrapper");
-const friendAvatars = document.querySelectorAll(".friend-avatar");
-
-// Friends Orbit configuration
-let friendsVisible = false;
 let glowTimeout = null;
 
 /**
@@ -272,14 +265,7 @@ function startRedirectFlow(url, name, svgIcon) {
   bioCard.classList.remove("card-enter");
   bioCard.classList.add("card-exit");
 
-  if (friendsVisible) {
-    friendsOrbit.classList.remove("rotating");
-    friendsOrbit.classList.remove("visible");
-    friendsOrbit.classList.add("card-exit-friends");
-    friendsConnectionsWrapper.classList.remove("rotating");
-    friendsConnectionsWrapper.classList.remove("visible");
-    friendsConnectionsWrapper.classList.add("card-exit-friends");
-  }
+
 
   setTimeout(() => {
     redirectIconContainer.innerHTML = "";
@@ -289,10 +275,6 @@ function startRedirectFlow(url, name, svgIcon) {
     progressPercentage.textContent = "0%";
     
     bioCard.style.display = "none";
-    if (friendsVisible) {
-      friendsOrbit.style.display = "none";
-      friendsConnectionsWrapper.style.display = "none";
-    }
 
     redirectModal.classList.remove("hidden");
     requestAnimationFrame(() => animateProgress(url));
@@ -368,19 +350,7 @@ function resetToMainCard() {
   startAvatarRotation();
   switchSnowEffect("main");
 
-  if (friendsVisible) {
-    friendsOrbit.style.display = "";
-    friendsOrbit.classList.remove("card-exit-friends");
-    friendsConnectionsWrapper.style.display = "";
-    friendsConnectionsWrapper.classList.remove("card-exit-friends");
-    
-    setTimeout(() => {
-      friendsOrbit.classList.add("visible");
-      friendsOrbit.classList.add("rotating");
-      friendsConnectionsWrapper.classList.add("visible");
-      friendsConnectionsWrapper.classList.add("rotating");
-    }, 300);
-  }
+
 }
 
 /**
@@ -398,21 +368,8 @@ function copyDeltaForceIdWithAnimation() {
   bioCard.classList.remove("card-enter");
   bioCard.classList.add("card-exit");
 
-  if (friendsVisible) {
-    friendsOrbit.classList.remove("rotating");
-    friendsOrbit.classList.remove("visible");
-    friendsOrbit.classList.add("card-exit-friends");
-    friendsConnectionsWrapper.classList.remove("rotating");
-    friendsConnectionsWrapper.classList.remove("visible");
-    friendsConnectionsWrapper.classList.add("card-exit-friends");
-  }
-
   setTimeout(() => {
     bioCard.style.display = "none";
-    if (friendsVisible) {
-      friendsOrbit.style.display = "none";
-      friendsConnectionsWrapper.style.display = "none";
-    }
 
     successModal.classList.remove("hidden");
     successModal.classList.add("card-enter");
@@ -428,32 +385,7 @@ function copyDeltaForceIdWithAnimation() {
   }, 500);
 }
 
-/**
- * Orbit Animation Control
- */
-function showFriends() {
-  friendsOrbit.classList.remove("hidden");
-  friendsConnectionsWrapper.classList.remove("hidden");
-  setTimeout(() => {
-    friendsOrbit.classList.add("visible");
-    friendsOrbit.classList.add("rotating");
-    friendsConnectionsWrapper.classList.add("visible");
-    friendsConnectionsWrapper.classList.add("rotating");
-  }, 50);
-}
 
-function hideFriends() {
-  friendsOrbit.classList.remove("visible");
-  friendsConnectionsWrapper.classList.remove("visible");
-  setTimeout(() => {
-    if (!friendsVisible) {
-      friendsOrbit.classList.remove("rotating");
-      friendsOrbit.classList.add("hidden");
-      friendsConnectionsWrapper.classList.remove("rotating");
-      friendsConnectionsWrapper.classList.add("hidden");
-    }
-  }, 600);
-}
 
 // Dynamic Glow Effects for Social Links
 function setupDynamicGlowHovers() {
@@ -560,16 +492,6 @@ socialLinks.forEach(link => {
 deltaForceBtn.addEventListener("click", e => {
   e.preventDefault();
   copyDeltaForceIdWithAnimation();
-});
-
-friendsBtn.addEventListener("click", () => {
-  friendsVisible = !friendsVisible;
-  if (friendsVisible) {
-    showFriends();
-  } else {
-    hideFriends();
-  }
-  friendsBtn.classList.toggle("active", friendsVisible);
 });
 
 
