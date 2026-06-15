@@ -275,6 +275,8 @@ function startRedirectFlow(url, name, svgIcon) {
   if (friendsVisible) {
     friendsOrbit.classList.remove("rotating");
     friendsOrbit.classList.add("card-exit-friends");
+    friendsConnections.classList.remove("rotating");
+    friendsConnections.classList.add("card-exit-friends");
   }
 
   setTimeout(() => {
@@ -287,6 +289,7 @@ function startRedirectFlow(url, name, svgIcon) {
     bioCard.style.display = "none";
     if (friendsVisible) {
       friendsOrbit.style.display = "none";
+      friendsConnections.style.display = "none";
     }
 
     redirectModal.classList.remove("hidden");
@@ -366,10 +369,14 @@ function resetToMainCard() {
   if (friendsVisible) {
     friendsOrbit.style.display = "";
     friendsOrbit.classList.remove("card-exit-friends");
+    friendsConnections.style.display = "";
+    friendsConnections.classList.remove("card-exit-friends");
     
     setTimeout(() => {
       friendsOrbit.classList.add("visible");
       friendsOrbit.classList.add("rotating");
+      friendsConnections.classList.add("visible");
+      friendsConnections.classList.add("rotating");
     }, 300);
   }
 }
@@ -392,12 +399,15 @@ function copyDeltaForceIdWithAnimation() {
   if (friendsVisible) {
     friendsOrbit.classList.remove("rotating");
     friendsOrbit.classList.add("card-exit-friends");
+    friendsConnections.classList.remove("rotating");
+    friendsConnections.classList.add("card-exit-friends");
   }
 
   setTimeout(() => {
     bioCard.style.display = "none";
     if (friendsVisible) {
       friendsOrbit.style.display = "none";
+      friendsConnections.style.display = "none";
     }
 
     successModal.classList.remove("hidden");
@@ -419,18 +429,24 @@ function copyDeltaForceIdWithAnimation() {
  */
 function showFriends() {
   friendsOrbit.classList.remove("hidden");
+  friendsConnections.classList.remove("hidden");
   setTimeout(() => {
     friendsOrbit.classList.add("visible");
     friendsOrbit.classList.add("rotating");
+    friendsConnections.classList.add("visible");
+    friendsConnections.classList.add("rotating");
   }, 50);
 }
 
 function hideFriends() {
   friendsOrbit.classList.remove("visible");
+  friendsConnections.classList.remove("visible");
   setTimeout(() => {
     if (!friendsVisible) {
       friendsOrbit.classList.remove("rotating");
       friendsOrbit.classList.add("hidden");
+      friendsConnections.classList.remove("rotating");
+      friendsConnections.classList.add("hidden");
     }
   }, 600);
 }
