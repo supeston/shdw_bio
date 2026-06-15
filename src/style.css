@@ -529,10 +529,10 @@ body {
 .capsule-border::before {
   content: '';
   position: absolute;
-  width: 320px;
-  height: 320px;
-  top: calc(50% - 160px);
-  left: calc(50% - 160px);
+  width: 600px;
+  height: 600px;
+  top: calc(50% - 300px);
+  left: calc(50% - 300px);
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
@@ -566,10 +566,10 @@ body {
 .capsule-glow .card-glow-inner::before {
   content: '';
   position: absolute;
-  width: 320px;
-  height: 320px;
-  top: calc(50% - 160px);
-  left: calc(50% - 160px);
+  width: 600px;
+  height: 600px;
+  top: calc(50% - 300px);
+  left: calc(50% - 300px);
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
@@ -863,10 +863,10 @@ body {
 .friends-btn-border::before {
   content: '';
   position: absolute;
-  width: 250px;
-  height: 250px;
-  top: calc(50% - 125px);
-  left: calc(50% - 125px);
+  width: 600px;
+  height: 600px;
+  top: calc(50% - 300px);
+  left: calc(50% - 300px);
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
@@ -900,10 +900,10 @@ body {
 .friends-btn-glow .card-glow-inner::before {
   content: '';
   position: absolute;
-  width: 250px;
-  height: 250px;
-  top: calc(50% - 125px);
-  left: calc(50% - 125px);
+  width: 600px;
+  height: 600px;
+  top: calc(50% - 300px);
+  left: calc(50% - 300px);
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
