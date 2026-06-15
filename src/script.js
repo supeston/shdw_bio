@@ -427,9 +427,9 @@ function showFriends() {
 
 function hideFriends() {
   friendsOrbit.classList.remove("visible");
-  friendsOrbit.classList.remove("rotating");
   setTimeout(() => {
     if (!friendsVisible) {
+      friendsOrbit.classList.remove("rotating");
       friendsOrbit.classList.add("hidden");
     }
   }, 600);
