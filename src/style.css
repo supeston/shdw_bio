@@ -501,7 +501,9 @@ body {
 /* Social & Utility Links Capsule */
 .social-links-capsule {
   position: relative;
-  width: 100%;
+  width: calc(100% + 40px);
+  margin-left: -20px;
+  margin-right: -20px;
   height: 54px;
   margin-bottom: 1.5rem;
   z-index: 2;
@@ -515,73 +517,8 @@ body {
   inset: 0;
   border-radius: 50px;
   background: #000000 !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   z-index: 3;
-}
-
-.capsule-border {
-  position: absolute;
-  inset: -1px;
-  border-radius: 51px;
-  overflow: hidden;
-  z-index: 2;
-}
-
-.capsule-border::before {
-  content: '';
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  top: calc(50% - 300px);
-  left: calc(50% - 300px);
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    var(--glow-c1) 0deg, var(--glow-c1) 60deg,
-    var(--glow-c2) 90deg, var(--glow-c2) 150deg,
-    var(--glow-c3) 180deg, var(--glow-c3) 240deg,
-    var(--glow-c4) 270deg, var(--glow-c4) 330deg,
-    var(--glow-c1) 360deg
-  );
-  animation: rotateGlow 40s linear infinite;
-  will-change: transform;
-  transition: --glow-c1 0.7s ease-in-out, --glow-c2 0.7s ease-in-out, --glow-c3 0.7s ease-in-out, --glow-c4 0.7s ease-in-out;
-}
-
-.capsule-glow {
-  position: absolute;
-  inset: -4px;
-  border-radius: 54px;
-  filter: blur(15px);
-  opacity: 0.95;
-  z-index: 1;
-}
-
-.capsule-glow .card-glow-inner {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  overflow: hidden;
-}
-
-.capsule-glow .card-glow-inner::before {
-  content: '';
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  top: calc(50% - 300px);
-  left: calc(50% - 300px);
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    var(--glow-c1) 0deg, var(--glow-c1) 60deg,
-    var(--glow-c2) 90deg, var(--glow-c2) 150deg,
-    var(--glow-c3) 180deg, var(--glow-c3) 240deg,
-    var(--glow-c4) 270deg, var(--glow-c4) 330deg,
-    var(--glow-c1) 360deg
-  );
-  animation: rotateGlow 40s linear infinite;
-  will-change: transform;
-  transition: --glow-c1 0.7s ease-in-out, --glow-c2 0.7s ease-in-out, --glow-c3 0.7s ease-in-out, --glow-c4 0.7s ease-in-out;
 }
 
 .social-links {
