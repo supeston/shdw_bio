@@ -498,64 +498,132 @@ body {
 }
 
 /* Social & Utility Links */
-.social-links {
-  display: flex;
-  justify-content: center;
-  gap: 1.2rem;
-  z-index: 2;
+/* Social & Utility Links Capsule */
+.social-links-capsule {
   position: relative;
+  width: 100%;
+  height: 54px;
+  margin-bottom: 1.5rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.capsule-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+  background: #000000 !important;
+  z-index: 3;
+}
+
+.capsule-border {
+  position: absolute;
+  inset: -1px;
+  border-radius: 51px;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.capsule-border::before {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  top: calc(50% - 160px);
+  left: calc(50% - 160px);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--glow-c1) 0deg, var(--glow-c1) 60deg,
+    var(--glow-c2) 90deg, var(--glow-c2) 150deg,
+    var(--glow-c3) 180deg, var(--glow-c3) 240deg,
+    var(--glow-c4) 270deg, var(--glow-c4) 330deg,
+    var(--glow-c1) 360deg
+  );
+  animation: rotateGlow 40s linear infinite;
+  will-change: transform;
+  transition: --glow-c1 0.7s ease-in-out, --glow-c2 0.7s ease-in-out, --glow-c3 0.7s ease-in-out, --glow-c4 0.7s ease-in-out;
+}
+
+.capsule-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 54px;
+  filter: blur(15px);
+  opacity: 0.95;
+  z-index: 1;
+}
+
+.capsule-glow .card-glow-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.capsule-glow .card-glow-inner::before {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  top: calc(50% - 160px);
+  left: calc(50% - 160px);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--glow-c1) 0deg, var(--glow-c1) 60deg,
+    var(--glow-c2) 90deg, var(--glow-c2) 150deg,
+    var(--glow-c3) 180deg, var(--glow-c3) 240deg,
+    var(--glow-c4) 270deg, var(--glow-c4) 330deg,
+    var(--glow-c1) 360deg
+  );
+  animation: rotateGlow 40s linear infinite;
+  will-change: transform;
+  transition: --glow-c1 0.7s ease-in-out, --glow-c2 0.7s ease-in-out, --glow-c3 0.7s ease-in-out, --glow-c4 0.7s ease-in-out;
+}
+
+.social-links {
+  position: relative;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 1rem;
 }
 
 .social-link {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
   color: var(--text-secondary);
   text-decoration: none;
   cursor: pointer;
-  position: relative;
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  overflow: hidden;
-  will-change: transform, border-color, box-shadow;
-}
-
-.social-link::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.12), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.4s;
-  border-radius: 50%;
+  transition: color 0.3s, transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  will-change: transform;
 }
 
 .social-link:hover {
   color: var(--text-primary);
-  border-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: 
-    0 10px 25px -10px rgba(0, 0, 0, 0.5),
-    0 0 20px rgba(255, 255, 255, 0.1);
-}
-
-.social-link:hover::before {
-  opacity: 1;
+  transform: translateY(-2px) scale(1.15);
 }
 
 .social-link svg {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   z-index: 1;
   transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .social-link:hover svg {
-  transform: scale(1.12);
+  transform: scale(1.08);
 }
 
 .delta-force {
@@ -795,10 +863,10 @@ body {
 .friends-btn-border::before {
   content: '';
   position: absolute;
-  width: 180%;
-  height: 180%;
-  top: -40%;
-  left: -40%;
+  width: 250px;
+  height: 250px;
+  top: calc(50% - 125px);
+  left: calc(50% - 125px);
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
@@ -832,10 +900,10 @@ body {
 .friends-btn-glow .card-glow-inner::before {
   content: '';
   position: absolute;
-  width: 180%;
-  height: 180%;
-  top: -40%;
-  left: -40%;
+  width: 250px;
+  height: 250px;
+  top: calc(50% - 125px);
+  left: calc(50% - 125px);
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
@@ -1064,18 +1132,14 @@ body {
     font-size: 0.65rem;
   }
   
-  .social-links {
-    gap: 0.8rem;
-  }
-  
-  .social-link {
-    width: 44px;
-    height: 44px;
+  .social-links-capsule {
+    height: 48px;
+    margin-bottom: 1rem;
   }
   
   .social-link svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
   }
   
   .friends-orbit {
