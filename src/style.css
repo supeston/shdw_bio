@@ -302,7 +302,7 @@ body {
   height: 380px;
   border-radius: 35px;
   box-shadow: 0 30px 90px -10px rgba(0, 0, 0, 0.9);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), box-shadow 0.4s;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), box-shadow 0.4s, height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
   will-change: transform, box-shadow;
 }
@@ -523,49 +523,26 @@ body {
   filter: drop-shadow(0 0 18px rgba(255, 204, 0, 0.7));
 }
 
-/* Tooltip container styling */
-.cake-tooltip {
-  position: absolute;
-  bottom: 110%;
-  left: 50%;
-  transform: translateX(-50%) translateY(10px) scale(0.9);
-  background: rgba(4, 4, 9, 0.85);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 14px;
-  padding: 0.8rem 1.2rem;
+/* Inline Message styling */
+.cake-message {
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-width: 260px;
+  gap: 2px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 0, 127, 0.1);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
   transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              visibility 0.3s;
+              height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              margin-top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 100;
 }
 
-.cake-tooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-width: 6px;
-  border-style: solid;
-  border-color: rgba(4, 4, 9, 0.85) transparent transparent transparent;
-}
-
-.birthday-cake-container:hover .cake-tooltip {
+.bio-card.cake-expanded .cake-message {
+  height: 38px;
   opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0) scale(1);
+  margin-top: 10px;
 }
 
 .tooltip-title {
@@ -625,7 +602,11 @@ body.birthday-theme .card-glow {
 
 body.birthday-theme .bio-card,
 body.birthday-theme .modal-card {
-  height: 430px;
+  height: 400px;
+}
+
+body.birthday-theme .bio-card.cake-expanded {
+  height: 440px;
 }
 
 /* Social & Utility Links */
@@ -900,7 +881,11 @@ body.birthday-theme .modal-card {
   
   body.birthday-theme .bio-card,
   body.birthday-theme .modal-card {
-    height: 370px;
+    height: 340px;
+  }
+
+  body.birthday-theme .bio-card.cake-expanded {
+    height: 380px;
   }
   
   .card-content {

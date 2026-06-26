@@ -111,6 +111,14 @@ function initBirthdayState() {
     if (!birthdaySynth) {
       birthdaySynth = new HappyBirthdayAudio();
     }
+
+    const cakeContainer = document.getElementById("birthday-cake-container");
+    const bioCardElement = document.querySelector(".bio-card");
+    if (cakeContainer && bioCardElement) {
+      cakeContainer.addEventListener("mouseenter", () => bioCardElement.classList.add("cake-expanded"));
+      cakeContainer.addEventListener("mouseleave", () => bioCardElement.classList.remove("cake-expanded"));
+      cakeContainer.addEventListener("click", () => bioCardElement.classList.toggle("cake-expanded"));
+    }
   }
 }
 
