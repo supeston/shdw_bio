@@ -40,109 +40,20 @@ const DELTA_FORCE_ID = "27544840130911559978";
 let isBirthday = false;
 let birthdaySynth = null;
 
-const BIRTHDAY_NOTES = {
-  'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'A#4': 466.16, 'B4': 493.88,
-  'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00
-};
-
-const BIRTHDAY_MELODY = [
-  ['C4', 0.75], ['C4', 0.25], ['D4', 1.0], ['C4', 1.0], ['F4', 1.0], ['E4', 2.0],
-  ['C4', 0.75], ['C4', 0.25], ['D4', 1.0], ['C4', 1.0], ['G4', 1.0], ['F4', 2.0],
-  ['C4', 0.75], ['C4', 0.25], ['C5', 1.0], ['A4', 1.0], ['F4', 1.0], ['E4', 1.0], ['D4', 2.0],
-  ['A#4', 0.75], ['A#4', 0.25], ['A4', 1.0], ['F4', 1.0], ['G4', 1.0], ['F4', 2.0]
-];
-
-class HappyBirthdaySynth {
+class HappyBirthdayAudio {
   constructor() {
-    this.audioCtx = null;
-    this.isPlaying = false;
-    this.timeoutIds = [];
-    this.tempo = 140; // BPM
-    this.beatDuration = 60 / this.tempo;
-  }
-
-  init() {
-    if (!this.audioCtx) {
-      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-  }
-
-  playNote(pitchName, durationBeats, timeOffset) {
-    const pitchFreq = BIRTHDAY_NOTES[pitchName];
-    if (!pitchFreq) return;
-
-    const osc1 = this.audioCtx.createOscillator();
-    const osc2 = this.audioCtx.createOscillator();
-    const gainNode = this.audioCtx.createGain();
-
-    osc1.type = "triangle"; // Warm retro tone
-    osc1.frequency.setValueAtTime(pitchFreq, this.audioCtx.currentTime + timeOffset);
-
-    // Harmonic overtone: +1 octave (frequency * 2), low volume, for brightness
-    osc2.type = "sine";
-    osc2.frequency.setValueAtTime(pitchFreq * 2, this.audioCtx.currentTime + timeOffset);
-
-    const durationSec = durationBeats * this.beatDuration;
-    const playTime = this.audioCtx.currentTime + timeOffset;
-
-    gainNode.gain.setValueAtTime(0, playTime);
-    gainNode.gain.linearRampToValueAtTime(0.22, playTime + 0.015);
-    gainNode.gain.exponentialRampToValueAtTime(0.06, playTime + 0.15);
-    gainNode.gain.exponentialRampToValueAtTime(0.0001, playTime + durationSec);
-
-    osc1.connect(gainNode);
-    osc2.connect(gainNode);
-    gainNode.connect(this.audioCtx.destination);
-
-    osc1.start(playTime);
-    osc2.start(playTime);
-
-    osc1.stop(playTime + durationSec);
-    osc2.stop(playTime + durationSec);
+    this.audio = new Audio('src/happy_birthday.mp3');
+    this.audio.loop = true;
+    this.audio.volume = 0.5;
   }
 
   start() {
-    this.init();
-    if (this.isPlaying) return;
-    this.isPlaying = true;
-    this.playLoop();
+    this.audio.play().catch(e => console.log('Audio playback failed:', e));
   }
 
   stop() {
-    this.isPlaying = false;
-    this.timeoutIds.forEach(id => clearTimeout(id));
-    this.timeoutIds = [];
-    if (this.audioCtx && this.audioCtx.state !== 'closed') {
-      this.audioCtx.suspend();
-    }
-  }
-
-  playLoop() {
-    if (!this.isPlaying) return;
-    this.init();
-    
-    if (this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
-    }
-
-    let time = 0.05;
-
-    BIRTHDAY_MELODY.forEach(note => {
-      const pitch = note[0];
-      const beats = note[1];
-      this.playNote(pitch, beats, time);
-      time += beats * this.beatDuration;
-    });
-
-    const totalDurationSec = time + 1.5 * this.beatDuration;
-
-    const timeoutId = setTimeout(() => {
-      if (this.isPlaying) {
-        this.playLoop();
-      }
-    }, totalDurationSec * 1000);
-    
-    this.timeoutIds.push(timeoutId);
+    this.audio.pause();
+    this.audio.currentTime = 0;
   }
 }
 
@@ -175,7 +86,7 @@ function getBirthdayTooltipText() {
   const isTodayBirthday = now.getMonth() === 5 && now.getDate() === 26;
   
   if (isTodayBirthday) {
-    return `Сегодня мне исполнилось ${ageString}! 🎉🎂`;
+    return `Сегодня мне исполнилось ${ageString}! 🎂`;
   }
   
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -308,7 +219,7 @@ function handleEntryClick() {
   
   if (isBirthday) {
     if (!birthdaySynth) {
-      birthdaySynth = new HappyBirthdaySynth();
+      birthdaySynth = new HappyBirthdayAudio();
     }
     birthdaySynth.start();
     bgVideo.muted = true;
