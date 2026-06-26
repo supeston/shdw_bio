@@ -500,7 +500,7 @@ body {
 /* Birthday Theme Styles */
 .birthday-cake-container {
   position: relative;
-  display: flex;
+  display: none; /* Hidden on normal days */
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -509,6 +509,10 @@ body {
   z-index: 10;
   cursor: pointer;
   width: max-content;
+}
+
+body.birthday-theme .birthday-cake-container {
+  display: flex;
 }
 
 .cake-emoji-img {
