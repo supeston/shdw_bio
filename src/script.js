@@ -45,6 +45,8 @@ class HappyBirthdayAudio {
     this.audio = new Audio('happy.mp3');
     this.audio.loop = true;
     this.audio.volume = 0.5;
+    this.audio.preload = 'auto';
+    this.audio.load(); // Force the browser to begin fetching the audio file immediately
   }
 
   start() {
@@ -106,6 +108,9 @@ function initBirthdayState() {
   
   if (isBirthday) {
     document.body.classList.add("birthday-theme");
+    if (!birthdaySynth) {
+      birthdaySynth = new HappyBirthdayAudio();
+    }
   }
 }
 
