@@ -497,6 +497,132 @@ body {
   z-index: 2;
 }
 
+/* Birthday Theme Styles */
+.birthday-cake-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  margin-bottom: -0.5rem; /* Pull capsule up slightly to balance layout */
+  z-index: 10;
+  cursor: pointer;
+  width: max-content;
+}
+
+.cake-emoji-img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.4s;
+  filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.2));
+}
+
+.birthday-cake-container:hover .cake-emoji-img {
+  transform: scale(1.2) rotate(5deg);
+  filter: drop-shadow(0 0 18px rgba(255, 204, 0, 0.7));
+}
+
+/* Tooltip container styling */
+.cake-tooltip {
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px) scale(0.9);
+  background: rgba(4, 4, 9, 0.85);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 260px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 0, 127, 0.1);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              visibility 0.3s;
+  z-index: 100;
+}
+
+.cake-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(4, 4, 9, 0.85) transparent transparent transparent;
+}
+
+.birthday-cake-container:hover .cake-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.tooltip-title {
+  font-family: 'Russo One', sans-serif;
+  font-size: 0.8rem;
+  color: #ffcc00; /* gold */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.tooltip-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  color: #ffffff;
+  line-height: 1.3;
+}
+
+/* Birthday Glow Keyframes */
+@keyframes cakeBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.05); }
+}
+
+@keyframes birthdayGlowPulse {
+  0% {
+    filter: blur(40px);
+    opacity: 0.95;
+  }
+  100% {
+    filter: blur(60px);
+    opacity: 1.3;
+  }
+}
+
+/* Birthday active styles on body */
+body.birthday-theme {
+  /* Festive birthday color palette */
+  --accent-blue: #ff007f;   /* Hot pink */
+  --accent-red: #ff7700;    /* Vibrant orange */
+  --accent-yellow: #ffcc00; /* Gold */
+  --accent-green: #9900ff;  /* Purple */
+  
+  --glow-c1: var(--accent-blue);
+  --glow-c2: var(--accent-red);
+  --glow-c3: var(--accent-yellow);
+  --glow-c4: var(--accent-green);
+}
+
+body.birthday-theme .cake-emoji-img {
+  animation: cakeBounce 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px rgba(255, 0, 127, 0.6));
+}
+
+body.birthday-theme .card-glow {
+  animation: birthdayGlowPulse 4s ease-in-out infinite alternate;
+}
+
 /* Social & Utility Links */
 /* Social & Utility Links Capsule */
 .social-links-capsule {

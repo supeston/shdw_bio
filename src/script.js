@@ -36,6 +36,168 @@ let currentVideoIndex = 0;
 // Delta Force ID Config
 const DELTA_FORCE_ID = "27544840130911559978";
 
+// Birthday Config & State
+let isBirthday = false;
+let birthdaySynth = null;
+
+const BIRTHDAY_NOTES = {
+  'C4': 261.63, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'A#4': 466.16, 'B4': 493.88,
+  'C5': 523.25, 'D5': 587.33, 'E5': 659.25, 'F5': 698.46, 'G5': 783.99, 'A5': 880.00
+};
+
+const BIRTHDAY_MELODY = [
+  ['C4', 0.75], ['C4', 0.25], ['D4', 1.0], ['C4', 1.0], ['F4', 1.0], ['E4', 2.0],
+  ['C4', 0.75], ['C4', 0.25], ['D4', 1.0], ['C4', 1.0], ['G4', 1.0], ['F4', 2.0],
+  ['C4', 0.75], ['C4', 0.25], ['C5', 1.0], ['A4', 1.0], ['F4', 1.0], ['E4', 1.0], ['D4', 2.0],
+  ['A#4', 0.75], ['A#4', 0.25], ['A4', 1.0], ['F4', 1.0], ['G4', 1.0], ['F4', 2.0]
+];
+
+class HappyBirthdaySynth {
+  constructor() {
+    this.audioCtx = null;
+    this.isPlaying = false;
+    this.timeoutIds = [];
+    this.tempo = 140; // BPM
+    this.beatDuration = 60 / this.tempo;
+  }
+
+  init() {
+    if (!this.audioCtx) {
+      this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  }
+
+  playNote(pitchName, durationBeats, timeOffset) {
+    const pitchFreq = BIRTHDAY_NOTES[pitchName];
+    if (!pitchFreq) return;
+
+    const osc1 = this.audioCtx.createOscillator();
+    const osc2 = this.audioCtx.createOscillator();
+    const gainNode = this.audioCtx.createGain();
+
+    osc1.type = "triangle"; // Warm retro tone
+    osc1.frequency.setValueAtTime(pitchFreq, this.audioCtx.currentTime + timeOffset);
+
+    // Harmonic overtone: +1 octave (frequency * 2), low volume, for brightness
+    osc2.type = "sine";
+    osc2.frequency.setValueAtTime(pitchFreq * 2, this.audioCtx.currentTime + timeOffset);
+
+    const durationSec = durationBeats * this.beatDuration;
+    const playTime = this.audioCtx.currentTime + timeOffset;
+
+    gainNode.gain.setValueAtTime(0, playTime);
+    gainNode.gain.linearRampToValueAtTime(0.22, playTime + 0.015);
+    gainNode.gain.exponentialRampToValueAtTime(0.06, playTime + 0.15);
+    gainNode.gain.exponentialRampToValueAtTime(0.0001, playTime + durationSec);
+
+    osc1.connect(gainNode);
+    osc2.connect(gainNode);
+    gainNode.connect(this.audioCtx.destination);
+
+    osc1.start(playTime);
+    osc2.start(playTime);
+
+    osc1.stop(playTime + durationSec);
+    osc2.stop(playTime + durationSec);
+  }
+
+  start() {
+    this.init();
+    if (this.isPlaying) return;
+    this.isPlaying = true;
+    this.playLoop();
+  }
+
+  stop() {
+    this.isPlaying = false;
+    this.timeoutIds.forEach(id => clearTimeout(id));
+    this.timeoutIds = [];
+    if (this.audioCtx && this.audioCtx.state !== 'closed') {
+      this.audioCtx.suspend();
+    }
+  }
+
+  playLoop() {
+    if (!this.isPlaying) return;
+    this.init();
+    
+    if (this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
+
+    let time = 0.05;
+
+    BIRTHDAY_MELODY.forEach(note => {
+      const pitch = note[0];
+      const beats = note[1];
+      this.playNote(pitch, beats, time);
+      time += beats * this.beatDuration;
+    });
+
+    const totalDurationSec = time + 1.5 * this.beatDuration;
+
+    const timeoutId = setTimeout(() => {
+      if (this.isPlaying) {
+        this.playLoop();
+      }
+    }, totalDurationSec * 1000);
+    
+    this.timeoutIds.push(timeoutId);
+  }
+}
+
+function checkBirthday() {
+  const today = new Date();
+  isBirthday = today.getMonth() === 5 && today.getDate() === 26;
+  return isBirthday;
+}
+
+function getBirthdayTooltipText() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const birthYear = 2011; // 2026 - 15 = 2011
+  const age = Math.min(year - birthYear, 25);
+  
+  let ageString = "";
+  const lastDigit = age % 10;
+  const lastTwoDigits = age % 100;
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+    ageString = `${age} лет`;
+  } else if (lastDigit === 1) {
+    ageString = `${age} год`;
+  } else if (lastDigit >= 2 && lastDigit <= 4) {
+    ageString = `${age} года`;
+  } else {
+    ageString = `${age} лет`;
+  }
+
+  const birthdayThisYear = new Date(year, 5, 26);
+  const isTodayBirthday = now.getMonth() === 5 && now.getDate() === 26;
+  
+  if (isTodayBirthday) {
+    return `Сегодня мне исполнилось ${ageString}! 🎉🎂`;
+  }
+  
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (todayStart >= birthdayThisYear) {
+    return `В этом году мне исполнилось ${ageString}!`;
+  } else {
+    return `В этом году мне исполнится ${ageString}!`;
+  }
+}
+
+function initBirthdayState() {
+  checkBirthday();
+  const tooltipTextEl = document.getElementById("cake-tooltip-text");
+  if (tooltipTextEl) {
+    tooltipTextEl.textContent = getBirthdayTooltipText();
+  }
+  
+  if (isBirthday) {
+    document.body.classList.add("birthday-theme");
+  }
+}
+
 // DOM Elements
 const entryScreen = document.getElementById("entry-screen");
 const mainContent = document.getElementById("main-content");
@@ -104,6 +266,13 @@ function transitionToNextVideo() {
   setTimeout(() => {
     currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
     bgVideo.src = videoSources[currentVideoIndex];
+    if (isBirthday) {
+      bgVideo.muted = true;
+      bgVideo.volume = 0;
+    } else {
+      bgVideo.muted = false;
+      bgVideo.volume = 1;
+    }
     bgVideo.play().catch(err => {
       console.warn("Video transition failed:", err);
       // Fail state handles gracefully via CSS backdrop
@@ -136,7 +305,18 @@ function handleEntryClick() {
     mainContent.classList.add("visible");
     startAllSnow();
   }, 300);
-  playVideo();
+  
+  if (isBirthday) {
+    if (!birthdaySynth) {
+      birthdaySynth = new HappyBirthdaySynth();
+    }
+    birthdaySynth.start();
+    bgVideo.muted = true;
+    bgVideo.volume = 0;
+    bgVideo.play().catch(err => console.warn(err));
+  } else {
+    playVideo();
+  }
   startAvatarRotation();
 }
 
@@ -261,6 +441,9 @@ function startRedirectFlow(url, name, svgIcon) {
   // Pause main loops
   stopAvatarRotation();
   switchSnowEffect("redirect");
+  if (birthdaySynth) {
+    birthdaySynth.stop();
+  }
 
   bioCard.classList.remove("card-enter");
   bioCard.classList.add("card-exit");
@@ -349,6 +532,9 @@ function resetToMainCard() {
 
   startAvatarRotation();
   switchSnowEffect("main");
+  if (isBirthday && birthdaySynth) {
+    birthdaySynth.start();
+  }
 
 
 }
@@ -364,6 +550,9 @@ function copyDeltaForceIdWithAnimation() {
   // Pause background calculations
   stopAvatarRotation();
   switchSnowEffect("success");
+  if (birthdaySynth) {
+    birthdaySynth.stop();
+  }
 
   bioCard.classList.remove("card-enter");
   bioCard.classList.add("card-exit");
@@ -442,6 +631,7 @@ function setupDynamicGlowHovers() {
 
 // Initial Event listeners configuration
 document.addEventListener("DOMContentLoaded", () => {
+  initBirthdayState();
   preloadImages();
   setupVideoLoop();
   setupDynamicGlowHovers();
@@ -504,12 +694,24 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     bgVideo.pause();
     stopAvatarRotation();
+    if (birthdaySynth) {
+      birthdaySynth.stop();
+    }
   } else {
     // Only resume if we have already entered the main screen
     if (entryScreen.classList.contains("hidden")) {
       const isModalActive = !redirectModal.classList.contains("hidden") || !successModal.classList.contains("hidden");
       if (!isModalActive) {
-        playVideo();
+        if (isBirthday) {
+          bgVideo.muted = true;
+          bgVideo.volume = 0;
+          bgVideo.play().catch(err => console.warn(err));
+          if (birthdaySynth) {
+            birthdaySynth.start();
+          }
+        } else {
+          playVideo();
+        }
       }
       startAvatarRotation();
     }
