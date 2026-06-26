@@ -623,6 +623,11 @@ body.birthday-theme .card-glow {
   animation: birthdayGlowPulse 4s ease-in-out infinite alternate;
 }
 
+body.birthday-theme .bio-card,
+body.birthday-theme .modal-card {
+  height: 430px;
+}
+
 /* Social & Utility Links */
 /* Social & Utility Links Capsule */
 .social-links-capsule {
@@ -891,6 +896,11 @@ body.birthday-theme .card-glow {
     width: 320px;
     height: 320px;
     border-radius: 30px;
+  }
+  
+  body.birthday-theme .bio-card,
+  body.birthday-theme .modal-card {
+    height: 370px;
   }
   
   .card-content {
