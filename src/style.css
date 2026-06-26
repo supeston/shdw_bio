@@ -501,13 +501,14 @@ body {
 .birthday-cake-container {
   position: relative;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-top: 1rem;
   margin-bottom: -0.5rem; /* Pull capsule up slightly to balance layout */
   z-index: 10;
   cursor: pointer;
-  width: max-content;
+  width: 100%;
 }
 
 .cake-emoji-img {

@@ -88,7 +88,7 @@ function getBirthdayTooltipText() {
   const isTodayBirthday = now.getMonth() === 5 && now.getDate() === 26;
   
   if (isTodayBirthday) {
-    return `Сегодня мне исполнилось ${ageString}! 🎂`;
+    return `Сегодня мне исполнилось ${ageString}!`;
   }
   
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -112,12 +112,19 @@ function initBirthdayState() {
       birthdaySynth = new HappyBirthdayAudio();
     }
 
-    const cakeContainer = document.getElementById("birthday-cake-container");
+    const cakeEmoji = document.getElementById("cake-emoji");
     const bioCardElement = document.querySelector(".bio-card");
-    if (cakeContainer && bioCardElement) {
-      cakeContainer.addEventListener("mouseenter", () => bioCardElement.classList.add("cake-expanded"));
-      cakeContainer.addEventListener("mouseleave", () => bioCardElement.classList.remove("cake-expanded"));
-      cakeContainer.addEventListener("click", () => bioCardElement.classList.toggle("cake-expanded"));
+    if (cakeEmoji && bioCardElement) {
+      let isCakeClicked = false;
+      cakeEmoji.addEventListener("mouseenter", () => bioCardElement.classList.add("cake-expanded"));
+      cakeEmoji.addEventListener("mouseleave", () => {
+        if (!isCakeClicked) bioCardElement.classList.remove("cake-expanded");
+      });
+      cakeEmoji.addEventListener("click", () => {
+        isCakeClicked = !isCakeClicked;
+        if (isCakeClicked) bioCardElement.classList.add("cake-expanded");
+        else bioCardElement.classList.remove("cake-expanded");
+      });
     }
   }
 }
