@@ -508,7 +508,7 @@ body {
   margin-bottom: -0.5rem; /* Pull capsule up slightly to balance layout */
   z-index: 10;
   cursor: pointer;
-  width: 100%;
+  width: max-content;
 }
 
 .cake-emoji-img {
@@ -526,7 +526,7 @@ body {
 
 /* Inline Message styling */
 .cake-message {
-  height: 0;
+  max-height: 0;
   opacity: 0;
   overflow: hidden;
   display: flex;
@@ -534,14 +534,15 @@ body {
   align-items: center;
   gap: 2px;
   text-align: center;
+  flex-shrink: 0;
   transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-              height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+              max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
               margin-top 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   z-index: 100;
 }
 
 .bio-card.cake-expanded .cake-message {
-  height: 38px;
+  max-height: 60px;
   opacity: 1;
   margin-top: 10px;
 }

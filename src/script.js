@@ -112,15 +112,15 @@ function initBirthdayState() {
       birthdaySynth = new HappyBirthdayAudio();
     }
 
-    const cakeEmoji = document.getElementById("cake-emoji");
+    const cakeContainer = document.getElementById("birthday-cake-container");
     const bioCardElement = document.querySelector(".bio-card");
-    if (cakeEmoji && bioCardElement) {
+    if (cakeContainer && bioCardElement) {
       let isCakeClicked = false;
-      cakeEmoji.addEventListener("mouseenter", () => bioCardElement.classList.add("cake-expanded"));
-      cakeEmoji.addEventListener("mouseleave", () => {
+      cakeContainer.addEventListener("mouseenter", () => bioCardElement.classList.add("cake-expanded"));
+      cakeContainer.addEventListener("mouseleave", () => {
         if (!isCakeClicked) bioCardElement.classList.remove("cake-expanded");
       });
-      cakeEmoji.addEventListener("click", () => {
+      cakeContainer.addEventListener("click", () => {
         isCakeClicked = !isCakeClicked;
         if (isCakeClicked) bioCardElement.classList.add("cake-expanded");
         else bioCardElement.classList.remove("cake-expanded");
