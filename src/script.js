@@ -42,7 +42,7 @@ let birthdaySynth = null;
 
 class HappyBirthdayAudio {
   constructor() {
-    this.audio = new Audio('src/happy_birthday.mp3');
+    this.audio = new Audio('happy.mp3');
     this.audio.loop = true;
     this.audio.volume = 0.5;
   }
