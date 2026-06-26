@@ -1,10 +1,4 @@
-/**
- * shdw_bio - Optimized JavaScript
- * Focuses on high-performance animations, layout caching to prevent reflows,
- * and efficient DOM updates.
- */
 
-// Configuration
 const avatarImages = [
   "avatars/photo_2025-12-26_21-41-20.jpg",
   "avatars/photo_2025-12-26_21-41-27.jpg",
@@ -31,12 +25,8 @@ let currentAvatarIndex = 0;
 let avatarInterval = null;
 
 const videoSources = ["edit1.mp4", "edit2.mp4", "edit3.mp4"];
-let currentVideoIndex = 0;
-
-// Delta Force ID Config
-const DELTA_FORCE_ID = "27544840130911559978";
-
-// Birthday Config & State
+let currentVideoIndex = 0;
+const DELTA_FORCE_ID = "27544840130911559978";
 let isBirthday = false;
 let birthdaySynth = null;
 
@@ -46,7 +36,7 @@ class HappyBirthdayAudio {
     this.audio.loop = true;
     this.audio.volume = 0.5;
     this.audio.preload = 'auto';
-    this.audio.load(); // Force the browser to begin fetching the audio file immediately
+    this.audio.load(); 
   }
 
   start() {
@@ -68,7 +58,7 @@ function checkBirthday() {
 function getBirthdayTooltipText() {
   const now = new Date();
   const year = now.getFullYear();
-  const birthYear = 2011; // 2026 - 15 = 2011
+  const birthYear = 2011; 
   const age = Math.min(year - birthYear, 25);
   
   let ageString = "";
@@ -127,9 +117,7 @@ function initBirthdayState() {
       });
     }
   }
-}
-
-// DOM Elements
+}
 const entryScreen = document.getElementById("entry-screen");
 const mainContent = document.getElementById("main-content");
 const bgVideo = document.getElementById("bg-video");
@@ -149,9 +137,7 @@ const socialLinks = document.querySelectorAll(".social-link:not(.delta-force)");
 
 let glowTimeout = null;
 
-/**
- * Preload avatar rotation images to prevent flickering when transitioning
- */
+
 function preloadImages() {
   avatarImages.forEach(src => {
     const img = new Image();
@@ -159,9 +145,7 @@ function preloadImages() {
   });
 }
 
-/**
- * Handle avatar image slideshow rotation
- */
+
 function startAvatarRotation() {
   if (avatarInterval) clearInterval(avatarInterval);
   avatarInterval = setInterval(() => {
@@ -181,11 +165,9 @@ function stopAvatarRotation() {
   }
 }
 
-/* Layout calculations and SVG line pre-creations are removed as positioning is now statically handled in CSS and HTML */
 
-/**
- * Video background handlers
- */
+
+
 function setupVideoLoop() {
   bgVideo.addEventListener("ended", () => {
     transitionToNextVideo();
@@ -205,8 +187,7 @@ function transitionToNextVideo() {
       bgVideo.volume = 1;
     }
     bgVideo.play().catch(err => {
-      console.warn("Video transition failed:", err);
-      // Fail state handles gracefully via CSS backdrop
+      console.warn("Video transition failed:", err);
     });
     setTimeout(() => {
       videoFade.classList.remove("active");
@@ -227,9 +208,7 @@ function playVideo() {
   });
 }
 
-/**
- * Entry click handler to reveal the site and start loops
- */
+
 function handleEntryClick() {
   entryScreen.classList.add("hidden");
   setTimeout(() => {
@@ -251,9 +230,7 @@ function handleEntryClick() {
   startAvatarRotation();
 }
 
-/**
- * Safe canvas snow controller that only animates active canvases to save CPU
- */
+
 class SnowEffect {
   constructor(canvas) {
     this.canvas = canvas;
@@ -331,23 +308,19 @@ class SnowEffect {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
-    }
-    // Clear canvas when stopped to release canvas graphic buffer resources
+    }
     if (this.ctx) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
   }
-}
-
-// Instantiate and manage snow effects
+}
 const snowInstances = {
   main: null,
   redirect: null,
   success: null
 };
 
-function startAllSnow() {
-  // Initially we only start the main card snow
+function startAllSnow() {
   if (snowInstances.main) {
     snowInstances.main.start();
   }
@@ -365,11 +338,8 @@ function switchSnowEffect(activeKey) {
   });
 }
 
-/**
- * Redirect Modal progress animation and state management
- */
-function startRedirectFlow(url, name, svgIcon) {
-  // Pause main loops
+
+function startRedirectFlow(url, name, svgIcon) {
   stopAvatarRotation();
   switchSnowEffect("redirect");
   if (birthdaySynth) {
@@ -397,12 +367,11 @@ function startRedirectFlow(url, name, svgIcon) {
 
 function animateProgress(url) {
   let startTime = null;
-  const duration = 2000; // 2 seconds
+  const duration = 2000; 
 
   function step(timestamp) {
     if (!startTime) startTime = timestamp;
-    const progress = timestamp - startTime;
-    // Cubic ease-out for progression feel
+    const progress = timestamp - startTime;
     const t = 1 - Math.pow(1 - Math.min(progress / duration, 1), 3);
     
     progressFill.style.width = `${t * 100}%`;
@@ -426,14 +395,10 @@ function hideActiveModal() {
   
   activeModal.classList.add("hidden");
   activeModal.classList.remove("visible");
-  activeModalId = null;
-  
-  // Bring the bio card back
+  activeModalId = null;
   const bioCard = document.querySelector(".bio-card");
   bioCard.classList.remove("card-exit");
-  bioCard.classList.add("card-enter");
-
-  // Remove the locked glow color so it reverts to Google colors
+  bioCard.classList.add("card-enter");
   if (glowTimeout) {
     clearTimeout(glowTimeout);
     glowTimeout = null;
@@ -470,15 +435,11 @@ function resetToMainCard() {
 
 }
 
-/**
- * Delta Force ID copy behavior with success modal feedback
- */
+
 function copyDeltaForceIdWithAnimation() {
   navigator.clipboard.writeText(DELTA_FORCE_ID).catch(err => {
     console.error("Clipboard copy failed:", err);
-  });
-
-  // Pause background calculations
+  });
   stopAvatarRotation();
   switchSnowEffect("success");
   if (birthdaySynth) {
@@ -503,11 +464,7 @@ function copyDeltaForceIdWithAnimation() {
       }, 500);
     }, 1800);
   }, 500);
-}
-
-
-
-// Dynamic Glow Effects for Social Links
+}
 function setupDynamicGlowHovers() {
   const allSocialLinks = document.querySelectorAll(".social-link");
   allSocialLinks.forEach(link => {
@@ -545,9 +502,7 @@ function setupDynamicGlowHovers() {
             glowTimeout = null;
           }, 700);
         }, 50);
-      });
-
-      // When clicked, lock the glow color for the incoming modal
+      });
       link.addEventListener("click", () => {
         if (glowTimeout) {
           clearTimeout(glowTimeout);
@@ -558,16 +513,12 @@ function setupDynamicGlowHovers() {
       });
     }
   });
-}
-
-// Initial Event listeners configuration
+}
 document.addEventListener("DOMContentLoaded", () => {
   initBirthdayState();
   preloadImages();
   setupVideoLoop();
-  setupDynamicGlowHovers();
-
-  // Initialize Canvas Snow instances
+  setupDynamicGlowHovers();
   const canvasIds = {
     main: "snow-canvas",
     redirect: "snow-canvas-redirect",
@@ -579,17 +530,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (canvas) {
       snowInstances[key] = new SnowEffect(canvas);
     }
-  });
-
-  // Prevent double tap zooms on mobile
+  });
   document.addEventListener("touchstart", (e) => {
     if (e.touches.length > 1) {
       e.preventDefault();
     }
   }, { passive: false });
-});
-
-// Setup click action callbacks for redirects
+});
 socialLinks.forEach(link => {
   link.addEventListener("click", e => {
     e.preventDefault();
@@ -618,9 +565,7 @@ deltaForceBtn.addEventListener("click", e => {
 
 
 entryScreen.addEventListener("click", handleEntryClick);
-entryScreen.addEventListener("touchstart", handleEntryClick, { passive: true });
-
-// Power saving: Page Visibility API
+entryScreen.addEventListener("touchstart", handleEntryClick, { passive: true });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     bgVideo.pause();
@@ -628,8 +573,7 @@ document.addEventListener("visibilitychange", () => {
     if (birthdaySynth) {
       birthdaySynth.stop();
     }
-  } else {
-    // Only resume if we have already entered the main screen
+  } else {
     if (entryScreen.classList.contains("hidden")) {
       const isModalActive = !redirectModal.classList.contains("hidden") || !successModal.classList.contains("hidden");
       if (!isModalActive) {
