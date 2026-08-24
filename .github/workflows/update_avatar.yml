@@ -1,4 +1,4 @@
-﻿name: Update Telegram Avatar
+name: Update Telegram Avatar
 
 on:
   schedule:
@@ -17,7 +17,7 @@ jobs:
 
       - name: Fetch and update avatar from Telegram
         run: |
-          TG_HTML=$(curl -sL https://t.me/world_mogged)
+          TG_HTML=$(curl -sL https://t.me/s0tkka)
           IMG_URL=$(echo "$TG_HTML" | grep -oP '(?<=<meta property="og:image" content=")[^"]+' | head -n 1)
           if [ -n "$IMG_URL" ]; then
             echo "Found Telegram avatar: $IMG_URL"
@@ -32,7 +32,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add avatars/current_avatar.jpg
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Auto-update Telegram avatar for @world_mogged"
+            git commit -m "Auto-update Telegram avatar for @s0tkka"
             git push
           else
             echo "No changes in avatar."

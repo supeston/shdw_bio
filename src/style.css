@@ -481,9 +481,10 @@ body {
 
 
 .nickname {
-  font-family: 'Russo One', sans-serif;
-  font-size: 2.8rem;
-  letter-spacing: 0.02em; 
+  font-family: 'Unbounded', sans-serif;
+  font-weight: 900;
+  font-size: 2.3rem;
+  letter-spacing: -0.02em; 
   text-transform: uppercase;
   background: linear-gradient(to bottom, #ffffff 40%, rgba(255, 255, 255, 0.45));
   -webkit-background-clip: text;
@@ -492,7 +493,6 @@ body {
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
   margin-bottom: 0.5rem;
   z-index: 2;
-  transform: scaleX(1.35); 
   width: 100%;
   text-align: center;
 }
@@ -933,8 +933,8 @@ body.birthday-theme .bio-card.cake-expanded {
   }
   
   .nickname {
-    font-size: 2.1rem;
-    letter-spacing: 0.12em;
+    font-size: 1.8rem;
+    letter-spacing: -0.01em;
   }
   
   .quote {

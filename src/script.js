@@ -1,5 +1,5 @@
 
-const TG_USERNAME = "world_mogged";
+const TG_USERNAME = "s0tkka";
 const DEFAULT_AVATAR = "avatars/current_avatar.jpg";
 
 let currentVideoIndex = 0;
