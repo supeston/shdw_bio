@@ -24,10 +24,15 @@
 
   
   <div class="video-background">
-    <video id="bg-video" playsinline muted>
+    <video id="bg-video-0" class="bg-video active" playsinline preload="auto" muted>
       <source src="edit1.mp4" type="video/mp4">
     </video>
-    
+    <video id="bg-video-1" class="bg-video" playsinline preload="auto" muted>
+      <source src="edit2.mp4" type="video/mp4">
+    </video>
+    <video id="bg-video-2" class="bg-video" playsinline preload="auto" muted>
+      <source src="edit3.mp4" type="video/mp4">
+    </video>
     
     <div class="liquid-bg-container">
       <div class="liquid-blob blob-blue"></div>
@@ -36,7 +41,6 @@
       <div class="liquid-blob blob-green"></div>
     </div>
     
-    <div class="video-fade-overlay" id="video-fade"></div>
     <div class="video-overlay"></div>
   </div>
 

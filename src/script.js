@@ -24,9 +24,10 @@ const AVATAR_CHANGE_INTERVAL = 1500;
 let currentAvatarIndex = 0;
 let avatarInterval = null;
 
-const videoSources = ["edit1.mp4", "edit2.mp4", "edit3.mp4"];
-let currentVideoIndex = 0;
-const DELTA_FORCE_ID = "27544840130911559978";
+let currentVideoIndex = 0;
+let isSwitchingVideo = false;
+let videoElements = [];
+const DELTA_FORCE_ID = "27544840130911559978";
 let isBirthday = false;
 let birthdaySynth = null;
 
@@ -117,14 +118,12 @@ function initBirthdayState() {
       });
     }
   }
-}
+}
 const entryScreen = document.getElementById("entry-screen");
 const mainContent = document.getElementById("main-content");
-const bgVideo = document.getElementById("bg-video");
 const avatar = document.getElementById("avatar");
 const deltaForceBtn = document.getElementById("delta-force-btn");
 const copyNotification = document.getElementById("copy-notification");
-const videoFade = document.getElementById("video-fade");
 
 const redirectModal = document.getElementById("redirect-modal");
 const successModal = document.getElementById("success-modal");
@@ -169,39 +168,91 @@ function stopAvatarRotation() {
 
 
 function setupVideoLoop() {
-  bgVideo.addEventListener("ended", () => {
-    transitionToNextVideo();
+  videoElements = [
+    document.getElementById("bg-video-0"),
+    document.getElementById("bg-video-1"),
+    document.getElementById("bg-video-2")
+  ].filter(Boolean);
+
+  videoElements.forEach((vid, index) => {
+    vid.preload = "auto";
+    vid.addEventListener("timeupdate", () => {
+      if (index === currentVideoIndex && !isSwitchingVideo && vid.duration > 0) {
+        if (vid.currentTime >= vid.duration - 0.08) {
+          transitionToNextVideo();
+        }
+      }
+    });
+    vid.addEventListener("ended", () => {
+      if (index === currentVideoIndex && !isSwitchingVideo) {
+        transitionToNextVideo();
+      }
+    });
   });
 }
 
 function transitionToNextVideo() {
-  videoFade.classList.add("active");
-  setTimeout(() => {
-    currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
-    bgVideo.src = videoSources[currentVideoIndex];
-    if (isBirthday) {
-      bgVideo.muted = true;
-      bgVideo.volume = 0;
-    } else {
-      bgVideo.muted = false;
-      bgVideo.volume = 1;
+  if (isSwitchingVideo || videoElements.length <= 1) return;
+  isSwitchingVideo = true;
+
+  const prevIndex = currentVideoIndex;
+  const currentVid = videoElements[prevIndex];
+  const nextIndex = (prevIndex + 1) % videoElements.length;
+  const nextVid = videoElements[nextIndex];
+
+  if (!nextVid) {
+    isSwitchingVideo = false;
+    return;
+  }
+
+  nextVid.currentTime = 0;
+  if (isBirthday) {
+    nextVid.muted = true;
+    nextVid.volume = 0;
+  } else {
+    nextVid.muted = false;
+    nextVid.volume = 1;
+  }
+
+  const playPromise = nextVid.play();
+  nextVid.classList.add("active");
+
+  const finish = () => {
+    if (currentVid && currentVid !== nextVid) {
+      currentVid.classList.remove("active");
+      currentVid.pause();
+      currentVid.currentTime = 0;
     }
-    bgVideo.play().catch(err => {
-      console.warn("Video transition failed:", err);
+    currentVideoIndex = nextIndex;
+    isSwitchingVideo = false;
+  };
+
+  if (playPromise !== undefined) {
+    playPromise.then(finish).catch(err => {
+      console.warn("Next video play failed:", err);
+      finish();
     });
-    setTimeout(() => {
-      videoFade.classList.remove("active");
-    }, 500);
-  }, 500);
+  } else {
+    finish();
+  }
 }
 
 function playVideo() {
-  bgVideo.muted = false;
-  bgVideo.volume = 1;
-  bgVideo.play().catch(e => {
+  const currentVid = videoElements[currentVideoIndex] || videoElements[0];
+  if (!currentVid) return;
+
+  if (isBirthday) {
+    currentVid.muted = true;
+    currentVid.volume = 0;
+  } else {
+    currentVid.muted = false;
+    currentVid.volume = 1;
+  }
+
+  currentVid.play().catch(e => {
     console.log("Video play error (trying muted):", e);
-    bgVideo.muted = true;
-    bgVideo.play().catch(err => {
+    currentVid.muted = true;
+    currentVid.play().catch(err => {
       console.warn("Muted play failed. Showing liquid fallback.", err);
       document.body.classList.add("video-failed");
     });
@@ -215,15 +266,24 @@ function handleEntryClick() {
     mainContent.classList.add("visible");
     startAllSnow();
   }, 300);
-  
+
+  videoElements.forEach(vid => {
+    try {
+      vid.load();
+    } catch (e) {}
+  });
+
+  const activeVid = videoElements[currentVideoIndex] || videoElements[0];
   if (isBirthday) {
     if (!birthdaySynth) {
       birthdaySynth = new HappyBirthdayAudio();
     }
     birthdaySynth.start();
-    bgVideo.muted = true;
-    bgVideo.volume = 0;
-    bgVideo.play().catch(err => console.warn(err));
+    if (activeVid) {
+      activeVid.muted = true;
+      activeVid.volume = 0;
+      activeVid.play().catch(err => console.warn(err));
+    }
   } else {
     playVideo();
   }
@@ -565,22 +625,25 @@ deltaForceBtn.addEventListener("click", e => {
 
 
 entryScreen.addEventListener("click", handleEntryClick);
-entryScreen.addEventListener("touchstart", handleEntryClick, { passive: true });
+entryScreen.addEventListener("touchstart", handleEntryClick, { passive: true });
 document.addEventListener("visibilitychange", () => {
+  const activeVid = videoElements[currentVideoIndex];
   if (document.hidden) {
-    bgVideo.pause();
+    if (activeVid) activeVid.pause();
     stopAvatarRotation();
     if (birthdaySynth) {
       birthdaySynth.stop();
     }
-  } else {
+  } else {
     if (entryScreen.classList.contains("hidden")) {
       const isModalActive = !redirectModal.classList.contains("hidden") || !successModal.classList.contains("hidden");
       if (!isModalActive) {
         if (isBirthday) {
-          bgVideo.muted = true;
-          bgVideo.volume = 0;
-          bgVideo.play().catch(err => console.warn(err));
+          if (activeVid) {
+            activeVid.muted = true;
+            activeVid.volume = 0;
+            activeVid.play().catch(err => console.warn(err));
+          }
           if (birthdaySynth) {
             birthdaySynth.start();
           }

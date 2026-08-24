@@ -163,20 +163,32 @@ body {
   inset: 0;
   z-index: -1;
   overflow: hidden;
+  background: #000000;
 }
 
 .video-background video {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) translateZ(0);
   min-width: 100%;
   min-height: 100%;
   width: auto;
   height: auto;
   object-fit: cover;
-  opacity: 0.8;
+  opacity: 0;
+  visibility: hidden;
   filter: contrast(1.05) brightness(0.9);
+  pointer-events: none;
+  will-change: opacity, transform;
+  transition: opacity 0.04s linear;
+  backface-visibility: hidden;
+}
+
+.video-background video.active {
+  opacity: 0.8;
+  visibility: visible;
+  z-index: 0;
 }
 
 
