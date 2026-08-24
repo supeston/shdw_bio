@@ -218,9 +218,6 @@ function transitionToNextVideo() {
     nextVid.volume = 1;
   }
 
-  const playPromise = nextVid.play();
-  nextVid.classList.add("active");
-
   const finish = () => {
     if (currentVid && currentVid !== nextVid) {
       currentVid.classList.remove("active");
@@ -231,10 +228,14 @@ function transitionToNextVideo() {
     isSwitchingVideo = false;
   };
 
+  nextVid.classList.add("active");
+  const playPromise = nextVid.play();
+
   if (playPromise !== undefined) {
     playPromise.then(finish).catch(err => {
-      console.warn("Next video play failed:", err);
-      finish();
+      console.warn("Unmuted play rejected on transition, retrying muted:", err);
+      nextVid.muted = true;
+      nextVid.play().then(finish).catch(finish);
     });
   } else {
     finish();
@@ -253,14 +254,16 @@ function playVideo() {
     currentVid.volume = 1;
   }
 
-  currentVid.play().catch(e => {
-    console.log("Video play error (trying muted):", e);
-    currentVid.muted = true;
-    currentVid.play().catch(err => {
-      console.warn("Muted play failed. Showing liquid fallback.", err);
-      document.body.classList.add("video-failed");
+  const p = currentVid.play();
+  if (p !== undefined) {
+    p.catch(e => {
+      console.warn("Audio play rejected, falling back to muted:", e);
+      currentVid.muted = true;
+      currentVid.play().catch(err => {
+        console.warn("Muted play failed:", err);
+      });
     });
-  });
+  }
 }
 
 
@@ -271,25 +274,44 @@ function handleEntryClick() {
     startAllSnow();
   }, 300);
 
-  videoElements.forEach(vid => {
-    try {
-      vid.load();
-    } catch (e) {}
+  // Directly play the active video within the user gesture to satisfy mobile policies
+  const activeVid = videoElements[currentVideoIndex] || videoElements[0];
+  if (activeVid) {
+    if (isBirthday) {
+      activeVid.muted = true;
+      activeVid.volume = 0;
+    } else {
+      activeVid.muted = false;
+      activeVid.volume = 1;
+    }
+    const p = activeVid.play();
+    if (p !== undefined) {
+      p.catch(() => {
+        activeVid.muted = true;
+        activeVid.play().catch(e => console.warn(e));
+      });
+    }
+  }
+
+  // Warm-up and unlock other video elements within user gesture
+  videoElements.forEach((vid, i) => {
+    if (i !== currentVideoIndex && vid) {
+      vid.muted = true;
+      const p2 = vid.play();
+      if (p2 !== undefined) {
+        p2.then(() => {
+          vid.pause();
+          vid.currentTime = 0;
+        }).catch(() => {});
+      }
+    }
   });
 
-  const activeVid = videoElements[currentVideoIndex] || videoElements[0];
   if (isBirthday) {
     if (!birthdaySynth) {
       birthdaySynth = new HappyBirthdayAudio();
     }
     birthdaySynth.start();
-    if (activeVid) {
-      activeVid.muted = true;
-      activeVid.volume = 0;
-      activeVid.play().catch(err => console.warn(err));
-    }
-  } else {
-    playVideo();
   }
   startAvatarRotation();
 }
