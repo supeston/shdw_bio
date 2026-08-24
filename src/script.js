@@ -550,14 +550,79 @@ function copyDeltaForceIdWithAnimation() {
       }, 500);
     }, 1800);
   }, 500);
-}
+}
+
 function setupDynamicGlowHovers() {
+  const bioCardEl = document.querySelector(".bio-card");
   const allSocialLinks = document.querySelectorAll(".social-link");
+  const avatarContainer = document.querySelector(".avatar-container");
+  const cakeContainer = document.getElementById("birthday-cake-container");
+
+  const activateGlow = (type) => {
+    if (glowTimeout) {
+      clearTimeout(glowTimeout);
+      glowTimeout = null;
+    }
+    if (type) {
+      document.body.setAttribute("data-glow", type);
+    } else {
+      document.body.removeAttribute("data-glow");
+    }
+    document.body.classList.add("glow-active");
+    if (bioCardEl) bioCardEl.classList.add("touch-active");
+  };
+
+  const deactivateGlow = (delay = 200) => {
+    if (glowTimeout) clearTimeout(glowTimeout);
+    glowTimeout = setTimeout(() => {
+      document.body.classList.remove("glow-active");
+      if (bioCardEl) bioCardEl.classList.remove("touch-active");
+      glowTimeout = setTimeout(() => {
+        document.body.removeAttribute("data-glow");
+        glowTimeout = null;
+      }, 350);
+    }, delay);
+  };
+
+  if (bioCardEl) {
+    bioCardEl.addEventListener("mouseenter", () => {
+      if (!document.body.getAttribute("data-glow")) {
+        activateGlow("");
+      }
+    });
+    bioCardEl.addEventListener("mouseleave", () => {
+      deactivateGlow(50);
+    });
+
+    bioCardEl.addEventListener("touchstart", (e) => {
+      const link = e.target.closest(".social-link, .avatar-container, #birthday-cake-container");
+      if (!link) {
+        activateGlow("");
+      }
+    }, { passive: true });
+
+    bioCardEl.addEventListener("touchend", () => {
+      deactivateGlow(500);
+    }, { passive: true });
+  }
+
+  if (avatarContainer) {
+    avatarContainer.addEventListener("mouseenter", () => activateGlow("avatar"));
+    avatarContainer.addEventListener("mouseleave", () => deactivateGlow(50));
+    avatarContainer.addEventListener("touchstart", () => activateGlow("avatar"), { passive: true });
+  }
+
+  if (cakeContainer) {
+    cakeContainer.addEventListener("mouseenter", () => activateGlow("birthday"));
+    cakeContainer.addEventListener("mouseleave", () => deactivateGlow(50));
+    cakeContainer.addEventListener("touchstart", () => activateGlow("birthday"), { passive: true });
+  }
+
   allSocialLinks.forEach(link => {
     let glowType = "";
     if (link.classList.contains("delta-force")) {
       glowType = "delta";
-    } else if (link.href && (link.href.includes("t.me") || link.href.includes("telegram"))) {
+    } else if (link.href && (link.href.includes("t.me") || link.href.includes("telegram") || link.href.includes("s0tkka"))) {
       glowType = "telegram";
     } else if (link.href && link.href.includes("tiktok")) {
       glowType = "tiktok";
@@ -566,29 +631,15 @@ function setupDynamicGlowHovers() {
     }
 
     if (glowType) {
-      link.addEventListener("mouseenter", () => {
-        if (glowTimeout) {
-          clearTimeout(glowTimeout);
-          glowTimeout = null;
-        }
-        document.body.setAttribute("data-glow", glowType);
-        void document.body.offsetWidth;
-        document.body.classList.add("glow-active");
+      link.addEventListener("mouseenter", (e) => {
+        e.stopPropagation();
+        activateGlow(glowType);
       });
-      
-      link.addEventListener("mouseleave", () => {
-        if (glowTimeout) {
-          clearTimeout(glowTimeout);
-        }
-        
-        glowTimeout = setTimeout(() => {
-          document.body.classList.remove("glow-active");
-          glowTimeout = setTimeout(() => {
-            document.body.removeAttribute("data-glow");
-            glowTimeout = null;
-          }, 700);
-        }, 50);
-      });
+      link.addEventListener("mouseleave", () => deactivateGlow(50));
+      link.addEventListener("touchstart", (e) => {
+        e.stopPropagation();
+        activateGlow(glowType);
+      }, { passive: true });
       link.addEventListener("click", () => {
         if (glowTimeout) {
           clearTimeout(glowTimeout);

@@ -53,31 +53,45 @@
 
 
 body[data-glow="telegram"], body[data-active-glow="telegram"] {
-  --glow-c1: #229ED9;
-  --glow-c2: #ffffff;
-  --glow-c3: #229ED9;
+  --glow-c1: #0088cc;
+  --glow-c2: #229ED9;
+  --glow-c3: #55cbfd;
   --glow-c4: #ffffff;
 }
 
 body[data-glow="tiktok"], body[data-active-glow="tiktok"] {
-  --glow-c1: #000000;
-  --glow-c2: #ff007f;
-  --glow-c3: #00bfff;
+  --glow-c1: #25F4EE;
+  --glow-c2: #FE2C55;
+  --glow-c3: #00f2fe;
   --glow-c4: #ff007f;
 }
 
 body[data-glow="roblox"], body[data-active-glow="roblox"] {
-  --glow-c1: #1446FF;
-  --glow-c2: #ffffff;
-  --glow-c3: #1446FF;
-  --glow-c4: #ffffff;
+  --glow-c1: #e1251b;
+  --glow-c2: #ff4757;
+  --glow-c3: #ffffff;
+  --glow-c4: #b30000;
 }
 
 body[data-glow="delta"], body[data-active-glow="delta"] {
-  --glow-c1: #00ff7f;
-  --glow-c2: #ffffff;
-  --glow-c3: #00ff7f;
+  --glow-c1: #00ff88;
+  --glow-c2: #39ff14;
+  --glow-c3: #00e676;
   --glow-c4: #ffffff;
+}
+
+body[data-glow="avatar"], body[data-active-glow="avatar"] {
+  --glow-c1: #7c4dff;
+  --glow-c2: #00e5ff;
+  --glow-c3: #ff007f;
+  --glow-c4: #ffffff;
+}
+
+body[data-glow="birthday"], body[data-active-glow="birthday"] {
+  --glow-c1: #ff007f;
+  --glow-c2: #ffcc00;
+  --glow-c3: #ff7700;
+  --glow-c4: #9900ff;
 }
 
 
@@ -331,10 +345,11 @@ body {
   width: 380px;
   height: 380px;
   border-radius: 35px;
-  box-shadow: 0 30px 90px -10px rgba(0, 0, 0, 0.9);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.15), box-shadow 0.4s, height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 25px 70px -10px rgba(0, 0, 0, 0.85);
+  transition: box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   pointer-events: auto;
-  will-change: transform, box-shadow;
+  will-change: box-shadow;
+  transform: none !important;
 }
 
 .friend-glow, .friend-border {
@@ -358,9 +373,11 @@ body {
   inset: -6px;
   border-radius: 41px;
   filter: blur(40px);
-  opacity: 0.95;
+  opacity: 0;
   z-index: 1;
   pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+  will-change: opacity, filter;
 }
 
 .card-glow-inner {
@@ -447,13 +464,23 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-.bio-card:hover {
-  transform: translateY(-5px) scale(1.01);
-  box-shadow: 0 40px 100px -10px rgba(0, 0, 0, 0.98);
+.bio-card:hover,
+.bio-card:active,
+.bio-card.touch-active {
+  transform: none !important;
+  box-shadow: 0 35px 95px -10px rgba(0, 0, 0, 0.95);
 }
 
-.bio-card:hover .card-glow {
-  opacity: 0.85;
+.bio-card:hover .card-glow,
+.bio-card:active .card-glow,
+.bio-card.touch-active .card-glow,
+.modal-card:hover .card-glow,
+.modal-card:not(.hidden) .card-glow,
+body.glow-active .card-glow,
+body[data-glow] .card-glow,
+body[data-active-glow] .card-glow {
+  opacity: 0.95;
+  filter: blur(45px);
 }
 
 
@@ -712,11 +739,47 @@ body.birthday-theme .bio-card.cake-expanded {
   width: 26px;
   height: 26px;
   z-index: 1;
-  transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), filter 0.3s ease, color 0.3s ease;
 }
 
 .social-link:hover svg {
-  transform: scale(1.08);
+  transform: scale(1.12);
+}
+
+.social-link[title="Telegram"]:hover,
+body[data-glow="telegram"] .social-link[title="Telegram"] {
+  color: #229ED9;
+}
+.social-link[title="Telegram"]:hover svg,
+body[data-glow="telegram"] .social-link[title="Telegram"] svg {
+  filter: drop-shadow(0 0 12px rgba(34, 158, 217, 0.85));
+}
+
+.social-link[title="TikTok"]:hover,
+body[data-glow="tiktok"] .social-link[title="TikTok"] {
+  color: #FE2C55;
+}
+.social-link[title="TikTok"]:hover svg,
+body[data-glow="tiktok"] .social-link[title="TikTok"] svg {
+  filter: drop-shadow(0 0 12px rgba(254, 44, 85, 0.85)) drop-shadow(-2px 0 0 rgba(37, 244, 238, 0.85));
+}
+
+.social-link[title="Roblox"]:hover,
+body[data-glow="roblox"] .social-link[title="Roblox"] {
+  color: #ff4757;
+}
+.social-link[title="Roblox"]:hover svg,
+body[data-glow="roblox"] .social-link[title="Roblox"] svg {
+  filter: drop-shadow(0 0 12px rgba(225, 37, 27, 0.85));
+}
+
+.delta-force:hover,
+body[data-glow="delta"] .delta-force {
+  color: #00ff88;
+}
+.delta-force:hover svg,
+body[data-glow="delta"] .delta-force svg {
+  filter: drop-shadow(0 0 12px rgba(0, 255, 136, 0.85));
 }
 
 .delta-force {
