@@ -53,30 +53,30 @@
 
 
 body[data-glow="telegram"], body[data-active-glow="telegram"] {
-  --glow-c1: #0088cc;
-  --glow-c2: #229ED9;
-  --glow-c3: #55cbfd;
+  --glow-c1: #229ED9;
+  --glow-c2: #ffffff;
+  --glow-c3: #229ED9;
   --glow-c4: #ffffff;
 }
 
 body[data-glow="tiktok"], body[data-active-glow="tiktok"] {
-  --glow-c1: #25F4EE;
-  --glow-c2: #FE2C55;
-  --glow-c3: #00f2fe;
+  --glow-c1: #000000;
+  --glow-c2: #ff007f;
+  --glow-c3: #00bfff;
   --glow-c4: #ff007f;
 }
 
 body[data-glow="roblox"], body[data-active-glow="roblox"] {
-  --glow-c1: #e1251b;
-  --glow-c2: #ff4757;
-  --glow-c3: #ffffff;
-  --glow-c4: #b30000;
+  --glow-c1: #1446FF;
+  --glow-c2: #ffffff;
+  --glow-c3: #1446FF;
+  --glow-c4: #ffffff;
 }
 
 body[data-glow="delta"], body[data-active-glow="delta"] {
-  --glow-c1: #00ff88;
-  --glow-c2: #39ff14;
-  --glow-c3: #00e676;
+  --glow-c1: #00ff7f;
+  --glow-c2: #ffffff;
+  --glow-c3: #00ff7f;
   --glow-c4: #ffffff;
 }
 
@@ -766,11 +766,11 @@ body[data-glow="tiktok"] .social-link[title="TikTok"] svg {
 
 .social-link[title="Roblox"]:hover,
 body[data-glow="roblox"] .social-link[title="Roblox"] {
-  color: #ff4757;
+  color: #1446FF;
 }
 .social-link[title="Roblox"]:hover svg,
 body[data-glow="roblox"] .social-link[title="Roblox"] svg {
-  filter: drop-shadow(0 0 12px rgba(225, 37, 27, 0.85));
+  filter: drop-shadow(0 0 12px rgba(20, 70, 255, 0.85));
 }
 
 .delta-force:hover,
