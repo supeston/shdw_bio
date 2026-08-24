@@ -1,28 +1,6 @@
 
-const avatarImages = [
-  "avatars/photo_2025-12-26_21-41-20.jpg",
-  "avatars/photo_2025-12-26_21-41-27.jpg",
-  "avatars/photo_2025-12-26_21-41-36.jpg",
-  "avatars/photo_2025-12-26_21-41-43.jpg",
-  "avatars/photo_2025-12-26_21-41-50.jpg",
-  "avatars/photo_2025-12-26_21-41-56.jpg",
-  "avatars/photo_2025-12-26_21-42-05.jpg",
-  "avatars/photo_2025-12-26_21-42-13.jpg",
-  "avatars/photo_2025-12-26_21-42-20.jpg",
-  "avatars/photo_2025-12-26_21-43-08.jpg",
-  "avatars/photo_2025-12-26_21-43-23.jpg",
-  "avatars/photo_2025-12-26_21-43-32.jpg",
-  "avatars/photo_2025-12-26_21-43-46.jpg",
-  "avatars/photo_2025-12-26_21-43-59.jpg",
-  "avatars/photo_2025-12-26_21-44-04.jpg",
-  "avatars/photo_2025-12-26_21-44-33.jpg",
-  "avatars/photo_2025-12-26_21-44-38.jpg",
-  "avatars/photo_2025-12-26_21-44-46.jpg",
-  "avatars/photo_2025-12-26_21-44-52.jpg"
-];
-const AVATAR_CHANGE_INTERVAL = 1500;
-let currentAvatarIndex = 0;
-let avatarInterval = null;
+const TG_USERNAME = "world_mogged";
+const DEFAULT_AVATAR = "avatars/current_avatar.jpg";
 
 let currentVideoIndex = 0;
 let isSwitchingVideo = false;
@@ -137,32 +115,58 @@ const socialLinks = document.querySelectorAll(".social-link:not(.delta-force)");
 let glowTimeout = null;
 
 
-function preloadImages() {
-  avatarImages.forEach(src => {
-    const img = new Image();
-    img.src = src;
-  });
-}
-
-
-function startAvatarRotation() {
-  if (avatarInterval) clearInterval(avatarInterval);
-  avatarInterval = setInterval(() => {
-    avatar.classList.add("changing");
-    setTimeout(() => {
-      currentAvatarIndex = (currentAvatarIndex + 1) % avatarImages.length;
-      avatar.src = avatarImages[currentAvatarIndex];
-      avatar.classList.remove("changing");
-    }, 150);
-  }, AVATAR_CHANGE_INTERVAL);
-}
-
-function stopAvatarRotation() {
-  if (avatarInterval) {
-    clearInterval(avatarInterval);
-    avatarInterval = null;
+function fetchTelegramAvatar() {
+  const avatarEl = document.getElementById("avatar");
+  const cached = localStorage.getItem("shdw_tg_avatar");
+  if (cached && avatarEl) {
+    avatarEl.src = cached;
   }
+
+  const proxies = [
+    `https://api.allorigins.win/get?url=${encodeURIComponent(`https://t.me/${TG_USERNAME}`)}`,
+    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(`https://t.me/${TG_USERNAME}`)}`
+  ];
+
+  (async () => {
+    for (const proxyUrl of proxies) {
+      try {
+        const res = await fetch(proxyUrl);
+        if (!res.ok) continue;
+        let html = "";
+        if (proxyUrl.includes("allorigins")) {
+          const data = await res.json();
+          html = data.contents || "";
+        } else {
+          html = await res.text();
+        }
+        const match = html.match(/<meta property="og:image" content="([^"]+)"/i);
+        if (match && match[1]) {
+          const newUrl = match[1];
+          if (avatarEl && avatarEl.src !== newUrl) {
+            const preloader = new Image();
+            preloader.onload = () => {
+              avatarEl.classList.add("changing");
+              setTimeout(() => {
+                avatarEl.src = newUrl;
+                avatarEl.classList.remove("changing");
+                localStorage.setItem("shdw_tg_avatar", newUrl);
+              }, 150);
+            };
+            preloader.src = newUrl;
+          }
+          break;
+        }
+      } catch (e) {}
+    }
+  })();
 }
+
+function preloadImages() {
+  fetchTelegramAvatar();
+}
+
+function startAvatarRotation() {}
+function stopAvatarRotation() {}
 
 
 

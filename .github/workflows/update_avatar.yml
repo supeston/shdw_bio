@@ -1,0 +1,39 @@
+﻿name: Update Telegram Avatar
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-avatar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and update avatar from Telegram
+        run: |
+          TG_HTML=$(curl -sL https://t.me/world_mogged)
+          IMG_URL=$(echo "$TG_HTML" | grep -oP '(?<=<meta property="og:image" content=")[^"]+' | head -n 1)
+          if [ -n "$IMG_URL" ]; then
+            echo "Found Telegram avatar: $IMG_URL"
+            curl -sL "$IMG_URL" -o avatars/current_avatar.jpg
+          else
+            echo "Could not find avatar URL from Telegram page"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add avatars/current_avatar.jpg
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Auto-update Telegram avatar for @world_mogged"
+            git push
+          else
+            echo "No changes in avatar."
+          fi
