@@ -178,6 +178,18 @@ function setupVideoLoop() {
     document.getElementById("bg-video-2")
   ].filter(Boolean);
 
+  if (videoElements.length <= 1) {
+    videoElements.forEach(vid => {
+      vid.preload = "auto";
+      vid.loop = true;
+      vid.addEventListener("ended", () => {
+        vid.currentTime = 0;
+        vid.play().catch(() => {});
+      });
+    });
+    return;
+  }
+
   videoElements.forEach((vid, index) => {
     vid.preload = "auto";
     vid.addEventListener("timeupdate", () => {
