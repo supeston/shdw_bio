@@ -406,19 +406,393 @@ class SnowEffect {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
-    }
+    }
     if (this.ctx) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
   }
-}
+}
+
+class ParticleTextSystem {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.particles = [];
+    this.width = 0;
+    this.height = 0;
+    this.dpr = 1;
+    this.isMobile = false;
+
+    this.pointer = {
+      x: -9999,
+      y: -9999,
+      active: false
+    };
+
+    this.text = 'СОТКА';
+    this.fontFamily = 'Unbounded';
+    this.fontWeight = '900';
+    this.influenceRadius = 85;
+    this.maxPush = 14;
+    this.springFactor = 0.15;
+
+    // Theme color management
+    this.themeWeight = 0;
+    this.targetThemeWeight = 0;
+    this.currentThemeR = 255;
+    this.currentThemeG = 255;
+    this.currentThemeB = 255;
+    this.targetThemeR = 255;
+    this.targetThemeG = 255;
+    this.targetThemeB = 255;
+
+    this.isRunning = false;
+    this.animationFrameId = null;
+    this.resizeTimeout = null;
+
+    this.setupListeners();
+    this.init();
+  }
+
+  setTheme(themeName) {
+    const THEME_COLORS = {
+      telegram: { r: 34, g: 158, b: 217 },    // #229ED9
+      tiktok:   { r: 254, g: 44, b: 85 },     // #fe2c55
+      roblox:   { r: 45, g: 115, b: 255 },    // #2d73ff
+      delta:    { r: 0, g: 255, b: 136 }      // #00ff88
+    };
+
+    const theme = THEME_COLORS[themeName];
+    if (theme) {
+      this.targetThemeR = theme.r;
+      this.targetThemeG = theme.g;
+      this.targetThemeB = theme.b;
+      this.targetThemeWeight = 1.0;
+    } else {
+      this.targetThemeWeight = 0.0;
+    }
+  }
+
+  setupListeners() {
+    const handlePointerMove = (e) => {
+      if (!this.canvas) return;
+      const rect = this.canvas.getBoundingClientRect();
+      const margin = 120;
+      if (
+        e.clientX >= rect.left - margin &&
+        e.clientX <= rect.right + margin &&
+        e.clientY >= rect.top - margin &&
+        e.clientY <= rect.bottom + margin
+      ) {
+        this.pointer.x = e.clientX - rect.left;
+        this.pointer.y = e.clientY - rect.top;
+        this.pointer.active = true;
+      } else {
+        this.pointer.active = false;
+      }
+    };
+
+    const handlePointerLeave = () => {
+      this.pointer.active = false;
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerdown', handlePointerMove, { passive: true });
+    window.addEventListener('pointerup', handlePointerLeave, { passive: true });
+    window.addEventListener('pointercancel', handlePointerLeave, { passive: true });
+    document.addEventListener('mouseleave', handlePointerLeave, { passive: true });
+
+    window.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        handlePointerMove(e.touches[0]);
+      }
+    }, { passive: true });
+    window.addEventListener('touchend', handlePointerLeave, { passive: true });
+
+    window.addEventListener('resize', () => {
+      if (this.resizeTimeout) clearTimeout(this.resizeTimeout);
+      this.resizeTimeout = setTimeout(() => {
+        this.handleResize();
+      }, 100);
+    }, { passive: true });
+  }
+
+  async init() {
+    try {
+      if (document.fonts) {
+        await document.fonts.load('900 50px "Unbounded"');
+        await document.fonts.ready;
+      }
+    } catch (e) {
+      console.warn('Font loading error:', e);
+    }
+
+    this.buildParticles();
+    this.start();
+
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        this.buildParticles();
+      });
+    }
+  }
+
+  handleResize() {
+    if (!this.canvas) return;
+    const rect = this.canvas.getBoundingClientRect();
+    const w = Math.round(rect.width);
+    const h = Math.round(rect.height);
+    if (w !== this.width || h !== this.height) {
+      this.buildParticles();
+      for (let i = 0; i < this.particles.length; i++) {
+        this.particles[i].alpha = this.particles[i].baseAlpha;
+      }
+    }
+  }
+
+  buildParticles() {
+    if (!this.canvas) return;
+
+    this.isMobile = window.innerWidth <= 480;
+    const rect = this.canvas.getBoundingClientRect();
+    const cssWidth = Math.round(rect.width) || (this.isMobile ? 256 : 300);
+    const cssHeight = Math.round(rect.height) || (this.isMobile ? 56 : 76);
+
+    this.width = cssWidth;
+    this.height = cssHeight;
+    this.dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+
+    this.canvas.width = Math.round(cssWidth * this.dpr);
+    this.canvas.height = Math.round(cssHeight * this.dpr);
+
+    const fontSize = this.isMobile ? 38 : 50;
+    const scaleY = this.isMobile ? 1.4 : 1.5;
+    const letterGap = this.isMobile ? 6 : 9;
+    const step = 2;
+    const baseRadius = this.isMobile ? 0.72 : 0.78;
+
+    this.influenceRadius = this.isMobile ? 70 : 85;
+    this.maxPush = this.isMobile ? 11 : 15;
+
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = cssWidth;
+    offCanvas.height = cssHeight;
+    const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
+
+    offCtx.save();
+    offCtx.translate(cssWidth / 2, cssHeight / 2);
+    offCtx.scale(1, scaleY);
+    offCtx.font = `${this.fontWeight} ${fontSize}px "${this.fontFamily}", sans-serif`;
+    offCtx.textBaseline = 'alphabetic';
+    offCtx.fillStyle = '#ffffff';
+
+    const chars = ['С', 'О', 'Т', 'К', 'А'];
+    const widths = chars.map(ch => offCtx.measureText(ch).width);
+    const sumWidths = widths.reduce((a, b) => a + b, 0);
+    const totalWidth = sumWidths + (chars.length - 1) * letterGap;
+
+    const m = offCtx.measureText('О');
+    const yOffset = (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+
+    let currentX = -totalWidth / 2;
+    for (let i = 0; i < chars.length; i++) {
+      offCtx.textAlign = 'left';
+      offCtx.fillText(chars[i], currentX, yOffset);
+      currentX += widths[i] + letterGap;
+    }
+    offCtx.restore();
+
+    const imgData = offCtx.getImageData(0, 0, cssWidth, cssHeight).data;
+
+    const startX = Math.floor((cssWidth % step) / 2);
+    const startY = Math.floor((cssHeight % step) / 2);
+
+    let minY = Infinity;
+    let maxY = -Infinity;
+
+    for (let y = startY; y < cssHeight; y += step) {
+      for (let x = startX; x < cssWidth; x += step) {
+        const idx = (y * cssWidth + x) * 4 + 3;
+        if (imgData[idx] > 120) {
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+
+    const textHeight = Math.max(maxY - minY, 1);
+    const newParticles = [];
+
+    for (let y = startY; y < cssHeight; y += step) {
+      for (let x = startX; x < cssWidth; x += step) {
+        const idx = (y * cssWidth + x) * 4 + 3;
+        const alpha = imgData[idx];
+
+        if (alpha > 120) {
+          const normY = Math.max(0, Math.min(1, (y - minY) / textHeight));
+          let defR, defG, defB, baseAlpha;
+          if (normY <= 0.4) {
+            defR = 255;
+            defG = 255;
+            defB = 255;
+            baseAlpha = 1.0;
+          } else {
+            const t = (normY - 0.4) / 0.6;
+            defR = Math.round(255 - t * (255 - 184));
+            defG = Math.round(255 - t * (255 - 184));
+            defB = Math.round(255 - t * (255 - 192));
+            baseAlpha = 1.0 - t * 0.22;
+          }
+
+          const edgeWeight = Math.min(1, alpha / 220);
+          baseAlpha *= edgeWeight;
+
+          newParticles.push({
+            originX: x,
+            originY: y,
+            x: x,
+            y: y,
+            defR,
+            defG,
+            defB,
+            r: defR,
+            g: defG,
+            b: defB,
+            normY,
+            baseAlpha,
+            alpha: baseAlpha,
+            radius: baseRadius,
+            targetX: x,
+            targetY: y,
+            targetAlpha: baseAlpha
+          });
+        }
+      }
+    }
+
+    this.particles = newParticles;
+  }
+
+  update() {
+    const pointer = this.pointer;
+    const radius = this.influenceRadius;
+    const maxPush = this.maxPush;
+    const spring = this.springFactor;
+    const particles = this.particles;
+
+    const colorSpeed = 0.085;
+    this.themeWeight += (this.targetThemeWeight - this.themeWeight) * colorSpeed;
+    this.currentThemeR += (this.targetThemeR - this.currentThemeR) * colorSpeed;
+    this.currentThemeG += (this.targetThemeG - this.currentThemeG) * colorSpeed;
+    this.currentThemeB += (this.targetThemeB - this.currentThemeB) * colorSpeed;
+
+    const tw = this.themeWeight;
+    const isThemed = tw > 0.002;
+
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+
+      if (pointer.active) {
+        const dx = p.originX - pointer.x;
+        const dy = p.originY - pointer.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < radius) {
+          const ratio = dist / radius;
+          const fade = Math.pow(ratio, 1.6);
+          p.targetAlpha = p.baseAlpha * fade;
+
+          const force = (1 - ratio);
+          const push = force * maxPush;
+          const angle = Math.atan2(dy, dx);
+          p.targetX = p.originX + Math.cos(angle) * push;
+          p.targetY = p.originY + Math.sin(angle) * push;
+        } else {
+          p.targetAlpha = p.baseAlpha;
+          p.targetX = p.originX;
+          p.targetY = p.originY;
+        }
+      } else {
+        p.targetAlpha = p.baseAlpha;
+        p.targetX = p.originX;
+        p.targetY = p.originY;
+      }
+
+      p.x += (p.targetX - p.x) * spring;
+      p.y += (p.targetY - p.y) * spring;
+      p.alpha += (p.targetAlpha - p.alpha) * spring;
+
+      if (!isThemed) {
+        p.r = p.defR;
+        p.g = p.defG;
+        p.b = p.defB;
+      } else {
+        const highlight = (1 - p.normY) * 28 * tw;
+        const tr = Math.min(255, this.currentThemeR + highlight);
+        const tg = Math.min(255, this.currentThemeG + highlight);
+        const tb = Math.min(255, this.currentThemeB + highlight);
+
+        p.r = Math.round(p.defR * (1 - tw) + tr * tw);
+        p.g = Math.round(p.defG * (1 - tw) + tg * tw);
+        p.b = Math.round(p.defB * (1 - tw) + tb * tw);
+      }
+    }
+  }
+
+  draw() {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    ctx.clearRect(0, 0, this.width, this.height);
+
+    const particles = this.particles;
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      if (p.alpha <= 0.01) continue;
+
+      const currentRadius = p.radius * (0.35 + 0.65 * (p.alpha / p.baseAlpha));
+
+      ctx.fillStyle = `rgba(${p.r}, ${p.g}, ${p.b}, ${p.alpha.toFixed(3)})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, currentRadius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  animate() {
+    if (!this.isRunning) return;
+    if (this.canvas.offsetParent !== null) {
+      this.update();
+      this.draw();
+    }
+    this.animationFrameId = requestAnimationFrame(() => this.animate());
+  }
+
+  start() {
+    if (this.isRunning) return;
+    this.isRunning = true;
+    this.animate();
+  }
+
+  stop() {
+    this.isRunning = false;
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+  }
+}
+
+let particleTextSystem = null;
 const snowInstances = {
   main: null,
   redirect: null,
   success: null
 };
 
-function startAllSnow() {
+function startAllSnow() {
   if (snowInstances.main) {
     snowInstances.main.start();
   }
@@ -437,7 +811,7 @@ function switchSnowEffect(activeKey) {
 }
 
 
-function startRedirectFlow(url, name, svgIcon) {
+function startRedirectFlow(url, name, svgIcon) {
   stopAvatarRotation();
   switchSnowEffect("redirect");
   if (birthdaySynth) {
@@ -469,7 +843,7 @@ function animateProgress(url) {
 
   function step(timestamp) {
     if (!startTime) startTime = timestamp;
-    const progress = timestamp - startTime;
+    const progress = timestamp - startTime;
     const t = 1 - Math.pow(1 - Math.min(progress / duration, 1), 3);
     
     progressFill.style.width = `${t * 100}%`;
@@ -493,10 +867,10 @@ function hideActiveModal() {
   
   activeModal.classList.add("hidden");
   activeModal.classList.remove("visible");
-  activeModalId = null;
+  activeModalId = null;
   const bioCard = document.querySelector(".bio-card");
   bioCard.classList.remove("card-exit");
-  bioCard.classList.add("card-enter");
+  bioCard.classList.add("card-enter");
   if (glowTimeout) {
     clearTimeout(glowTimeout);
     glowTimeout = null;
@@ -507,6 +881,9 @@ function hideActiveModal() {
 }
 
 function resetToMainCard() {
+  if (particleTextSystem) {
+    particleTextSystem.setTheme(null);
+  }
   redirectModal.classList.add("hidden");
   redirectModal.classList.remove("card-enter");
   successModal.classList.add("hidden");
@@ -537,7 +914,7 @@ function resetToMainCard() {
 function copyDeltaForceIdWithAnimation() {
   navigator.clipboard.writeText(DELTA_FORCE_ID).catch(err => {
     console.error("Clipboard copy failed:", err);
-  });
+  });
   stopAvatarRotation();
   switchSnowEffect("success");
   if (birthdaySynth) {
@@ -582,9 +959,15 @@ function setupDynamicGlowHovers() {
     }
     document.body.classList.add("glow-active");
     if (bioCardEl) bioCardEl.classList.add("touch-active");
+    if (particleTextSystem) {
+      particleTextSystem.setTheme(type);
+    }
   };
 
   const deactivateGlow = (delay = 200) => {
+    if (particleTextSystem) {
+      particleTextSystem.setTheme(null);
+    }
     if (glowTimeout) clearTimeout(glowTimeout);
     glowTimeout = setTimeout(() => {
       document.body.classList.remove("glow-active");
@@ -662,12 +1045,12 @@ function setupDynamicGlowHovers() {
       });
     }
   });
-}
+}
 document.addEventListener("DOMContentLoaded", () => {
   initBirthdayState();
   preloadImages();
   setupVideoLoop();
-  setupDynamicGlowHovers();
+  setupDynamicGlowHovers();
   const canvasIds = {
     main: "snow-canvas",
     redirect: "snow-canvas-redirect",
@@ -679,13 +1062,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (canvas) {
       snowInstances[key] = new SnowEffect(canvas);
     }
-  });
+  });
+
+  const particleCanvas = document.getElementById("particle-text-canvas");
+  if (particleCanvas) {
+    particleTextSystem = new ParticleTextSystem(particleCanvas);
+  }
+
   document.addEventListener("touchstart", (e) => {
     if (e.touches.length > 1) {
       e.preventDefault();
     }
   }, { passive: false });
-});
+});
 socialLinks.forEach(link => {
   link.addEventListener("click", e => {
     e.preventDefault();
@@ -723,7 +1112,13 @@ document.addEventListener("visibilitychange", () => {
     if (birthdaySynth) {
       birthdaySynth.stop();
     }
+    if (particleTextSystem) {
+      particleTextSystem.stop();
+    }
   } else {
+    if (particleTextSystem) {
+      particleTextSystem.start();
+    }
     if (entryScreen.classList.contains("hidden")) {
       const isModalActive = !redirectModal.classList.contains("hidden") || !successModal.classList.contains("hidden");
       if (!isModalActive) {
