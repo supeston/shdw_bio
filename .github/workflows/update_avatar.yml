@@ -2,7 +2,7 @@ name: Update Telegram Avatar
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:
@@ -21,7 +21,14 @@ jobs:
           IMG_URL=$(echo "$TG_HTML" | grep -oP '(?<=<meta property="og:image" content=")[^"]+' | head -n 1)
           if [ -n "$IMG_URL" ]; then
             echo "Found Telegram avatar: $IMG_URL"
-            curl -sL "$IMG_URL" -o avatars/current_avatar.jpg
+            curl -sLf "$IMG_URL" -o avatars/temp_avatar.jpg
+            if [ -s avatars/temp_avatar.jpg ]; then
+              mv avatars/temp_avatar.jpg avatars/current_avatar.jpg
+              echo "Updated avatars/current_avatar.jpg successfully."
+            else
+              echo "Downloaded file is empty, keeping existing avatar."
+              rm -f avatars/temp_avatar.jpg
+            fi
           else
             echo "Could not find avatar URL from Telegram page"
           fi
