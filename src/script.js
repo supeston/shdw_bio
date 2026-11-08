@@ -115,54 +115,23 @@ const socialLinks = document.querySelectorAll(".social-link:not(.delta-force)");
 let glowTimeout = null;
 
 
-function fetchTelegramAvatar() {
+function initAvatar() {
   const avatarEl = document.getElementById("avatar");
-  const cached = localStorage.getItem("shdw_tg_avatar");
-  if (cached && avatarEl) {
-    avatarEl.src = cached;
+  try {
+    localStorage.removeItem("shdw_tg_avatar");
+  } catch (e) {}
+
+  if (avatarEl) {
+    avatarEl.onerror = () => {
+      if (avatarEl.src !== DEFAULT_AVATAR && !avatarEl.src.endsWith(DEFAULT_AVATAR)) {
+        avatarEl.src = DEFAULT_AVATAR;
+      }
+    };
   }
-
-  const proxies = [
-    `https://api.allorigins.win/get?url=${encodeURIComponent(`https://t.me/${TG_USERNAME}`)}`,
-    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(`https://t.me/${TG_USERNAME}`)}`
-  ];
-
-  (async () => {
-    for (const proxyUrl of proxies) {
-      try {
-        const res = await fetch(proxyUrl);
-        if (!res.ok) continue;
-        let html = "";
-        if (proxyUrl.includes("allorigins")) {
-          const data = await res.json();
-          html = data.contents || "";
-        } else {
-          html = await res.text();
-        }
-        const match = html.match(/<meta property="og:image" content="([^"]+)"/i);
-        if (match && match[1]) {
-          const newUrl = match[1];
-          if (avatarEl && avatarEl.src !== newUrl) {
-            const preloader = new Image();
-            preloader.onload = () => {
-              avatarEl.classList.add("changing");
-              setTimeout(() => {
-                avatarEl.src = newUrl;
-                avatarEl.classList.remove("changing");
-                localStorage.setItem("shdw_tg_avatar", newUrl);
-              }, 150);
-            };
-            preloader.src = newUrl;
-          }
-          break;
-        }
-      } catch (e) {}
-    }
-  })();
 }
 
 function preloadImages() {
-  fetchTelegramAvatar();
+  initAvatar();
 }
 
 function startAvatarRotation() {}
